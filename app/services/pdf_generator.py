@@ -66,6 +66,9 @@ class PDFGenerator:
 
     @staticmethod
     def generate_report(project_id: str, data: dict, output_path: str):
+        # Save PDF to /tmp which is writable and reliable on Render containers
+        if not output_path.startswith("/"):
+            output_path = os.path.join("/tmp", output_path)
         c = canvas.Canvas(output_path, pagesize=letter)
         width, height = letter
         

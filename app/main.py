@@ -36,12 +36,22 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def root():
     return {"message": "Welcome to AI Home Designer API"}
 
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import os
 
 @app.get("/download/{filename}")
 def download_pdf(filename: str):
+    # Check current working directory first
     file_path = os.path.join(os.getcwd(), filename)
     if os.path.exists(file_path):
         return FileResponse(file_path, media_type='application/pdf', filename=filename)
-    return {"error": "File not found"}
+    
+    # Also check in /tmp directory
+    tmp_path = os.path.join("/tmp", filename)
+    if os.path.exists(tmp_path):
+        return FileResponse(tmp_path, media_type='application/pdf', filename=filename)
+    
+    return JSONResponse(
+        status_code=404,
+        content={"error": f"PDF '{filename}' not found. Please regenerate your design and try downloading again immediately after generation."}
+    )
