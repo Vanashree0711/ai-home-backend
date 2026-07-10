@@ -81,8 +81,8 @@ async def generate_project(req: GenerationRequest, background_tasks: BackgroundT
             "interior_image": safe_interior_url,
             "floorplan_image": safe_floorplan_url
         }
-        # 4. Generate PDF Report synchronously so it's ready before returning response
-        PDFGenerator.generate_report("proj_" + str(req.plot_size), pdf_data, pdf_filename)
+        # 4. Generate PDF Report asynchronously in the background to speed up response time
+        background_tasks.add_task(PDFGenerator.generate_report, "proj_" + str(req.plot_size), pdf_data, pdf_filename)
         
         # 5. Save to Database
         new_project = Project(
