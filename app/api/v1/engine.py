@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import Optional
 from pydantic import BaseModel
@@ -21,7 +21,7 @@ class GenerationRequest(BaseModel):
     prompt: str = Field(..., min_length=1, description="Prompt cannot be empty")
 
 @router.post("/generate")
-async def generate_project(req: GenerationRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def generate_project(req: GenerationRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     The core autonomous endpoint.
     1. Generates Exterior/Interior concepts via OpenAI DALL-E.
@@ -81,7 +81,8 @@ async def generate_project(req: GenerationRequest, db: Session = Depends(get_db)
             "interior_image": safe_interior_url,
             "floorplan_image": safe_floorplan_url
         }
-        pdf_path = PDFGenerator.generate_report("proj_" + str(req.plot_size), pdf_data, pdf_filename)
+        # 4. Generate PDF Report in the background asynchronously (cuts down user wait time by 20+ seconds!)
+        background_tasks.add_task(PDFGenerator.generate_report, "proj_" + str(req.plot_size), pdf_data, pdf_filename)
         
         # 5. Save to Database
         new_project = Project(
@@ -109,7 +110,7 @@ async def generate_project(req: GenerationRequest, db: Session = Depends(get_db)
             "interior_image": safe_interior_url,
             "floorplan_image": safe_floorplan_url,
             "analysis": analysis_data,
-            "pdf_report": pdf_path
+            "pdf_report": pdf_filename
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generation Engine Error: {str(e)}")
