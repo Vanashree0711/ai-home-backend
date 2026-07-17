@@ -18,7 +18,7 @@ class AIEngineService:
         # Include budget and plot size in the prompt so the AI respects it!
         exterior_prompt = f"Photorealistic exterior architectural render, {style} style house, {plot_size} sqft, ${budget} budget. {prompt}. Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k"
         interior_prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt}. Wide angle shot, professional interior photography, ultra detailed, 8k"
-        floorplan_prompt = f"Architectural floor plan drawing, top-down overhead view, {style} style, {plot_size} sqft house. Clean 2D blueprint layout showing rooms: living room, kitchen, bedrooms, bathrooms, corridors. Thick black walls, white room fills, labeled rooms, professional architectural drafting style, flat orthographic projection, no perspective, no furniture shadows, clean technical drawing"
+        floorplan_prompt = f"3D isometric cutaway architectural floor plan, {style} style house, {plot_size} sqft. Roof removed to show all rooms from above at 45 degree isometric angle. Rooms colored differently: living room in warm beige, kitchen in soft blue, bedrooms in pale green, bathrooms in light grey. Thick solid walls, realistic furniture inside each room, clean pastel color palette, professional architectural visualization, bright natural daylight, high detail"
         
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
