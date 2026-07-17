@@ -18,7 +18,7 @@ class AIEngineService:
         # Include budget and plot size in the prompt so the AI respects it!
         exterior_prompt = f"Photorealistic exterior architectural render, {style} style house, {plot_size} sqft, ${budget} budget. {prompt}. Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k"
         interior_prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt}. Wide angle shot, professional interior photography, ultra detailed, 8k"
-        floorplan_prompt = f"3D isometric cutaway architectural floor plan, {style} style house, {plot_size} sqft. Roof removed to show all rooms from above at 45 degree isometric angle. Rooms colored differently: living room in warm beige, kitchen in soft blue, bedrooms in pale green, bathrooms in light grey. Thick solid walls, realistic furniture inside each room, clean pastel color palette, professional architectural visualization, bright natural daylight, high detail"
+        floorplan_prompt = f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. The roof is completely removed to reveal all interior rooms from directly above. Camera looking straight down at 90 degrees, orthographic projection. Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt}"
         
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
@@ -26,11 +26,10 @@ class AIEngineService:
         
         # Use a single master seed to enforce color and geometric consistency across all 3 images
         master_seed = random.randint(1, 1000000)
-        fp_seed = random.randint(1, 1000000)  # Separate seed for floor plan so it doesn't mimic exterior
 
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={fp_seed}&model=flux&enhance=false"
+        fp_url = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
 
         return {
             "exterior_url": ext_url,
