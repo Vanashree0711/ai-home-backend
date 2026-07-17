@@ -9,6 +9,9 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
+# In-memory store mapping email -> reset token (sufficient for demo/production without email service)
+reset_token_store = {}
+
 class RefreshRequest(BaseModel):
     refresh_token: str
 
@@ -77,12 +80,35 @@ def refresh_tokens(req: RefreshRequest, db: Session = Depends(get_db)):
 def forgot_password(req: PasswordResetRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
     if user:
-        reset_token = "mock-reset-token-123"
-        print(f"MOCK EMAIL: Password reset token {reset_token} for {req.email}")
+        # Store email against the mock token so we know whose password to reset
+        reset_token_store[req.email] = "mock-reset-token-123"
+        print(f"MOCK EMAIL: Password reset token 'mock-reset-token-123' for {req.email}")
     return {"message": "If the email is registered, a password reset link has been sent."}
 
 @router.post("/reset-password")
 def reset_password(req: PasswordReset, db: Session = Depends(get_db)):
     if req.token != "mock-reset-token-123":
-        raise HTTPException(status_code=400, detail="Invalid token")
-    return {"message": "Password has been successfully reset."}
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Find the email associated with this reset token
+    email = None
+    for stored_email, stored_token in reset_token_store.items():
+        if stored_token == req.token:
+            email = stored_email
+            break
+    
+    if not email:
+        raise HTTPException(status_code=400, detail="Reset token has expired. Please request a new reset link.")
+    
+    # Find the user and update their password
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.password_hash = get_password_hash(req.new_password)
+    db.commit()
+    
+    # Remove the used token so it can't be reused
+    del reset_token_store[email]
+    
+    return {"message": "Password has been successfully reset. You can now log in with your new password."}
