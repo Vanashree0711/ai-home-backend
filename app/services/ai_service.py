@@ -16,9 +16,9 @@ class AIEngineService:
         import urllib.parse
         
         # Include budget and plot size in the prompt so the AI respects it!
-        exterior_prompt = f"A photorealistic exterior architectural render of a {plot_size} sqft house. Budget constraints: ${budget}. Style: {style}. {prompt}. Professional lighting, 8k resolution"
-        interior_prompt = f"A photorealistic interior architectural render of a living room for a {plot_size} sqft house. Style: {style}. {prompt}. Professional lighting"
-        floorplan_prompt = f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. The roof is completely removed to reveal all interior rooms from directly above. Camera looking straight down at 90 degrees, orthographic projection. Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt}"
+        exterior_prompt = f"Photorealistic exterior architectural render, {style} style house, {plot_size} sqft, ${budget} budget. {prompt}. Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k"
+        interior_prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt}. Wide angle shot, professional interior photography, ultra detailed, 8k"
+        floorplan_prompt = f"Architectural floor plan drawing, top-down overhead view, {style} style, {plot_size} sqft house. Clean 2D blueprint layout showing rooms: living room, kitchen, bedrooms, bathrooms, corridors. Thick black walls, white room fills, labeled rooms, professional architectural drafting style, flat orthographic projection, no perspective, no furniture shadows, clean technical drawing"
         
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
@@ -26,10 +26,11 @@ class AIEngineService:
         
         # Use a single master seed to enforce color and geometric consistency across all 3 images
         master_seed = random.randint(1, 1000000)
+        fp_seed = random.randint(1, 1000000)  # Separate seed for floor plan so it doesn't mimic exterior
 
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        fp_url = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={fp_seed}&model=flux&enhance=false"
 
         return {
             "exterior_url": ext_url,
