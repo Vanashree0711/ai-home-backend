@@ -281,18 +281,16 @@ def build_design_dna(spec: dict) -> str:
     ext = spec["exterior"]
     materials_str = ", ".join(vi["materials"][:3])
     features = []
-    if ext["has_swimming_pool"]: features.append("rectangular swimming pool")
+    if ext["has_swimming_pool"]: features.append("swimming pool")
     if ext["has_balcony"]: features.append("glass-railed balcony")
     if ext["has_rooftop_terrace"]: features.append("rooftop terrace")
     if ext["has_landscaped_garden"]: features.append("landscaped garden")
     features_str = ", ".join(features) if features else "landscaped garden"
 
     dna = (
-        f"[DESIGN DNA: {h['floors']}-storey {vi['style']} residence. "
-        f"Primary: {vi['primary_color']}. Accent: {vi['secondary_color']}. "
-        f"Materials: {materials_str}. Windows: {vi['windows']}. "
-        f"Roof: {ext['roof']}. Features: {features_str}. "
-        f"Lighting: {vi['lighting']}. Language: {vi['design_language']}.]"
+        f"Style: {vi['style']}. {h['floors']}-storey. "
+        f"Colors: {vi['primary_color']} with {vi['secondary_color']} accents. "
+        f"Materials: {materials_str}. Windows: {vi['windows']}."
     )
     return dna
 
@@ -304,33 +302,15 @@ def build_design_dna(spec: dict) -> str:
 def build_exterior_prompt(spec: dict, dna: str) -> str:
     h = spec["house"]
     ext = spec["exterior"]
-    vi = spec["visual_identity"]
+    prompt_str = spec["original_prompt"]
 
-    materials_str = " and ".join(ext["materials"][:4])
-    features = []
-    if ext["has_swimming_pool"]: features.append("a rectangular swimming pool")
-    if ext["has_balcony"]: features.append("a spacious glass-railed balcony")
-    if ext["has_rooftop_terrace"]: features.append("a rooftop terrace")
-    if ext["has_landscaped_garden"]: features.append("a landscaped tropical garden")
-    if ext["has_parking"]: features.append("a covered car parking area")
-    if ext["has_courtyard"]: features.append("an inner courtyard")
-    features_str = (", ".join(features) + ". ") if features else ""
-
+    # Match the July 10th format perfectly
     prompt = (
-        f"Professional photorealistic architectural exterior visualization. "
-        f"{dna} "
-        f"Subject: A {h['floors']}-storey {h['architectural_style']} luxury residence. "
-        f"The facade is finished in {ext['primary_color']} with {ext['secondary_color']} accents. "
-        f"Materials used: {materials_str}. "
-        f"Windows: {ext['windows']}. Roof: {ext['roof']}. "
-        f"{features_str}"
-        f"Camera: eye-level three-quarter front perspective, wide architectural composition. "
-        f"Lighting: golden hour warm natural sunlight, realistic shadows, HDR sky. "
-        f"Rendering: ultra-photorealistic, physically based materials, realistic reflections, "
-        f"sharp architectural details, high dynamic range, professional architectural photography, "
-        f"architectural magazine quality, 8K resolution. "
-        f"Negative: no cartoon, no illustration, no warped geometry, no extra floors, "
-        f"no floating objects, no text, no watermark, no generic building."
+        f"A photorealistic exterior architectural render of a {h['plot_size_sqft']} sqft house. "
+        f"Budget constraints: ${h['budget_usd']}. Style: {h['architectural_style']}. "
+        f"Design details: {dna}. "
+        f"{prompt_str}. "
+        f"Professional lighting, 8k resolution"
     )
     return prompt
 
@@ -338,67 +318,35 @@ def build_exterior_prompt(spec: dict, dna: str) -> str:
 def build_interior_prompt(spec: dict, dna: str) -> str:
     h = spec["house"]
     interior = spec["interior"]
-    vi = spec["visual_identity"]
-    ext = spec["exterior"]
+    prompt_str = spec["original_prompt"]
 
-    special_rooms = []
-    if interior["has_home_theatre"]: special_rooms.append("home theatre")
-    if interior["has_study"]: special_rooms.append("home office/study")
-    if interior["has_gym"]: special_rooms.append("home gym")
-    special_str = (", ".join(special_rooms) + ", ") if special_rooms else ""
-
+    # Match the July 10th format perfectly
     prompt = (
-        f"Professional photorealistic interior architectural visualization of THE SAME HOUSE. "
-        f"{dna} "
-        f"Subject: The open-plan living room of this {h['architectural_style']} {h['floors']}-storey luxury residence. "
-        f"CRITICAL: This interior MUST visually belong to the same house shown on the exterior. "
-        f"Maintain IDENTICAL: {ext['primary_color']} walls, {vi['secondary_color']} accents, "
-        f"{ext['windows']} matching the exterior, {vi['lighting']} — same architectural DNA throughout. "
-        f"Room: Spacious open-plan living room with {interior['flooring']} flooring, "
-        f"premium contemporary furniture, {interior['kitchen_type']} visible in background, "
-        f"{special_str}large windows matching the exterior facade. "
-        f"Interior style: {vi['design_language']}. "
-        f"Camera: eye-level wide-angle 24mm lens, realistic perspective, straight vertical lines. "
-        f"Lighting: {interior['lighting']}, realistic bounce light, warm ambient. "
-        f"Rendering: ultra-photorealistic, physically accurate materials, realistic shadows, "
-        f"professional interior architectural photography, architectural magazine quality, 8K. "
-        f"Negative: no mismatched style, no rustic/industrial/cartoon interior if not requested, "
-        f"no empty room, no generic hotel lobby, no text, no warped furniture."
+        f"A photorealistic interior architectural render of a living room for a {h['plot_size_sqft']} sqft house. "
+        f"Style: {h['architectural_style']}. "
+        f"Design details: {dna}. "
+        f"Interior details: {interior['flooring']} flooring, {interior['lighting']}. "
+        f"{prompt_str}. "
+        f"Professional lighting"
     )
     return prompt
 
 
 def build_3d_prompt(spec: dict, dna: str) -> str:
     h = spec["house"]
-    ext = spec["exterior"]
-    vi = spec["visual_identity"]
+    prompt_str = spec["original_prompt"]
 
-    materials_str = ", ".join(ext["materials"][:3])
-    features = []
-    if ext["has_swimming_pool"]: features.append("swimming pool visible from above")
-    if ext["has_landscaped_garden"]: features.append("landscaped garden")
-    if ext["has_balcony"]: features.append("balconies visible")
-    if ext["has_parking"]: features.append("parking area")
-    features_str = (", ".join(features) + ". ") if features else ""
-
+    # Exact phrasing from July 10th floorplan prompt
     prompt = (
-        f"Professional photorealistic architectural 3D top-down visualization. "
-        f"{dna} "
-        f"Subject: A roof-removed top-down isometric 3D architectural view of THE SAME {h['floors']}-storey "
-        f"{h['architectural_style']} residence shown in this project. "
-        f"The roof is COMPLETELY REMOVED revealing all interior rooms from directly above. "
-        f"Camera: orthographic top-down view at exactly 90 degrees looking straight down, "
-        f"elevated three-quarter isometric perspective. "
-        f"Exterior walls in {ext['primary_color']}, {ext['secondary_color']} accent walls, "
-        f"materials: {materials_str}. "
-        f"{features_str}"
-        f"Interior visible: hardwood flooring, furniture from above, warm room lighting, "
-        f"room divisions clearly visible with thick dark charcoal walls. "
-        f"Rendering: ultra-photorealistic 3D architectural visualization, "
-        f"physically based rendering, realistic shadows from above, warm interior lighting, "
-        f"vibrant realistic colors, sharp wall edges, professional architectural 3D studio quality, 8K. "
-        f"Negative: no first-person view, no corridor view, no hallway perspective, "
-        f"no floating camera inside rooms, no dark unlit rooms, no cartoon, no watermark."
+        f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a "
+        f"{h['plot_size_sqft']} sqft house in {h['architectural_style']} style. "
+        f"The roof is completely removed to reveal all interior rooms from directly above. "
+        f"Camera looking straight down at 90 degrees, orthographic projection. "
+        f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+        f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, "
+        f"vibrant realistic colors, contrasting walls. "
+        f"Design details: {dna}. "
+        f"{prompt_str}"
     )
     return prompt
 
@@ -407,7 +355,7 @@ def build_3d_prompt(spec: dict, dna: str) -> str:
 # IMAGE URL BUILDER
 # ──────────────────────────────────────────────────────────────────────────────
 
-def build_pollinations_url(prompt: str, seed: int, width: int = 1280, height: int = 960) -> str:
+def build_pollinations_url(prompt: str, seed: int, width: int = 1024, height: int = 1024) -> str:
     encoded = urllib.parse.quote(prompt)
     return (
         f"https://image.pollinations.ai/prompt/{encoded}"
