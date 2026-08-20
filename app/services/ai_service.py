@@ -1,53 +1,32 @@
 import random
 import urllib.parse
 from app.services.design_spec import parse_master_design_specification
+from app.services.prompt_engine import (
+    generate_all_specialized_prompts,
+    build_exterior_prompt,
+    build_interior_prompt,
+    build_3d_prompt
+)
 
 
 class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # 1. Master Design Specification (Single Source of Truth)
+        # 1. Master Design Specification (Single Source of Truth - Stage 1)
         spec = parse_master_design_specification(prompt, style, budget, plot_size)
 
-        # 2. Master Seed for color & aesthetic synchronicity across views
+        # 2. Specialized Image Prompt Engine (Stage 2)
+        specialized_prompts = generate_all_specialized_prompts(spec)
+
+        # 3. Master Seed for color, material & atmospheric synchronization
         master_seed = random.randint(1, 1000000)
 
-        # 3. Formulate prompts respecting the Master Design Specification
-        theme_anchor = f"{spec['architectural_style']} home with design requirements: {prompt}"
+        safe_exterior = urllib.parse.quote(specialized_prompts["exterior_prompt"])
+        safe_interior = urllib.parse.quote(specialized_prompts["interior_prompt"])
+        safe_floorplan = urllib.parse.quote(specialized_prompts["floorplan_prompt"])
 
-        # Exterior View
-        exterior_prompt = (
-            f"A photorealistic exterior architectural render of a {plot_size} sqft house in {spec['architectural_style']} style. "
-            f"Budget constraints: ${budget}. {prompt}. "
-            f"Front elevation view showing clean architectural facade, large floor-to-ceiling glass windows with warm indoor lighting visible inside, "
-            f"balcony with glass railing, modern geometry, beautiful landscaping with garden plants, soft natural daylight and twilight glow, "
-            f"professional architectural photography, 8k resolution"
-        )
-
-        # Interior View (Matching the same house specification)
-        interior_prompt = (
-            f"A photorealistic interior architectural render of the modern living room inside the SAME {spec['architectural_style']} house, {plot_size} sqft. "
-            f"{prompt}. "
-            f"Large floor-to-ceiling glass windows matching the exterior architecture, soft warm ambient lighting, elegant modern sofa, "
-            f"matching wall color palette and textures, professional architectural digest photography, 8k resolution"
-        )
-        
-        # 3D Architectural View (Matching the same house specification)
-        floorplan_prompt = (
-            f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of the SAME {plot_size} sqft house in {spec['architectural_style']} style. "
-            f"The roof is completely removed to reveal all interior rooms from directly above. "
-            f"Camera looking straight down at 90 degrees, orthographic projection. "
-            f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-            f"Warm inviting lighting, hardwood floors, furnished bedrooms, modern bathrooms, kitchen and living spaces. "
-            f"Vibrant realistic colors matching the house theme: {prompt}"
-        )
-
-        safe_exterior = urllib.parse.quote(exterior_prompt)
-        safe_interior = urllib.parse.quote(interior_prompt)
-        safe_floorplan = urllib.parse.quote(floorplan_prompt)
-
-        # Unified parameters across all three images
+        # Unified parameters across all three image pipelines
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
@@ -58,6 +37,7 @@ class AIEngineService:
             "floorplan_url": fp_url,
             "spec": spec,
             "seed": master_seed,
+            "prompts": specialized_prompts
         }
 
     @staticmethod
@@ -65,38 +45,15 @@ class AIEngineService:
         if seed is None:
             seed = random.randint(1, 1000000)
 
-        prompt_str = spec.get("original_prompt", "")
-        style = spec.get("architectural_style") or spec.get("house", {}).get("architectural_style", "Minimalist Scandinavian")
-        budget = spec.get("budget_usd") or spec.get("house", {}).get("budget_usd", 150000)
-        plot_size = spec.get("plot_size_sqft") or spec.get("house", {}).get("plot_size_sqft", 2500)
-
         if image_type == "exterior":
-            prompt = (
-                f"A photorealistic exterior architectural render of a {plot_size} sqft house in {style} style. "
-                f"Budget constraints: ${budget}. {prompt_str}. "
-                f"Front elevation view showing clean architectural facade, large floor-to-ceiling glass windows with warm indoor lighting visible inside, "
-                f"balcony with glass railing, modern geometry, beautiful landscaping with garden plants, soft natural daylight and twilight glow, "
-                f"professional architectural photography, 8k resolution"
-            )
+            prompt = build_exterior_prompt(spec)
         elif image_type == "interior":
-            prompt = (
-                f"A photorealistic interior architectural render of the modern living room inside the SAME {style} house, {plot_size} sqft. "
-                f"{prompt_str}. "
-                f"Large floor-to-ceiling glass windows matching the exterior architecture, soft warm ambient lighting, elegant modern sofa, "
-                f"matching wall color palette and textures, professional architectural digest photography, 8k resolution"
-            )
+            prompt = build_interior_prompt(spec)
         else:  # "3d"
-            prompt = (
-                f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of the SAME {plot_size} sqft house in {style} style. "
-                f"The roof is completely removed to reveal all interior rooms from directly above. "
-                f"Camera looking straight down at 90 degrees, orthographic projection. "
-                f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-                f"Warm inviting lighting, hardwood floors, furnished bedrooms, modern bathrooms, kitchen and living spaces. "
-                f"Vibrant realistic colors matching the house theme: {prompt_str}"
-            )
+            prompt = build_3d_prompt(spec)
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
-        return {"url": url, "seed": seed}
+        return {"url": url, "seed": seed, "prompt": prompt}
 
     @staticmethod
     async def generate_cost_estimate(plot_size: int, budget: int, style: str, prompt: str):
