@@ -59,34 +59,33 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # Ultra-Aesthetic Luxury Architectural Exterior
+        # 1. Exterior Render
         exterior_prompt = (
             f"Stunning breathtaking luxury {style} villa exterior, {plot_size} sqft, ${budget} budget. {prompt}. "
             f"Award-winning modern architecture, glowing warm golden hour ambient lighting, lush green landscaped gardens, "
             f"crystal clear water reflections, dramatic sky, high-end residential estate, hyper-realistic, photorealistic, 8k resolution, architectural magazine cover"
         )
 
-        # Ultra-Aesthetic Luxury Architectural Interior
+        # 2. Interior Living Room Render
         interior_prompt = (
             f"Luxurious spacious {style} living room interior design, {plot_size} sqft residence. {prompt}. "
             f"High ceiling, large floor-to-ceiling glass windows overlooking garden, ultra-premium Italian designer furniture, "
             f"warm cozy ambient lighting, marble and hardwood finishes, elegant aesthetic, Architectural Digest featured, 8k resolution, photorealistic masterpiece"
         )
         
-        # 3D Orthographic Top-Down Cutaway Architecture
+        # 3. 3D Architectural Cutaway Model / Isometric Architectural Floorplan
         floorplan_prompt = (
-            f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
-            f"The roof is completely removed to reveal all interior rooms from directly above. "
-            f"Camera looking straight down at 90 degrees, orthographic projection. "
-            f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-            f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt}"
+            f"3D architectural cutaway model of a modern {style} house floor plan layout, {plot_size} sqft, {prompt}. "
+            f"Isometric elevated perspective view, complete house with roof removed to display full interior layout. "
+            f"Clean solid white structural partition walls with black trim, light wooden parquet flooring, fully furnished living room with sofa, "
+            f"master bedroom with double bed, modern bathroom with ceramic tub, kitchen with island, outdoor wooden terrace deck with garden patio. "
+            f"Architectural miniature model visualization on neutral clean background, soft natural studio lighting, crisp sharp edges, ultra high quality 3D architectural rendering"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Independent seeds for maximum visual beauty and clarity
         seed_ext = random.randint(1, 1000000)
         seed_int = random.randint(1, 1000000)
         seed_fp  = random.randint(1, 1000000)
@@ -129,11 +128,11 @@ class AIEngineService:
             )
         else:  # "3d"
             prompt = (
-                f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
-                f"The roof is completely removed to reveal all interior rooms from directly above. "
-                f"Camera looking straight down at 90 degrees, orthographic projection. "
-                f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-                f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt_str}"
+                f"3D architectural cutaway model of a modern {style} house floor plan layout, {plot_size} sqft, {prompt_str}. "
+                f"Isometric elevated perspective view, complete house with roof removed to display full interior layout. "
+                f"Clean solid white structural partition walls with black trim, light wooden parquet flooring, fully furnished living room with sofa, "
+                f"master bedroom with double bed, modern bathroom with ceramic tub, kitchen with island, outdoor wooden terrace deck with garden patio. "
+                f"Architectural miniature model visualization on neutral clean background, soft natural studio lighting, crisp sharp edges, ultra high quality 3D architectural rendering"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
