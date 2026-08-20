@@ -59,27 +59,24 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # 1. Exterior Render
+        # 1. High-End Exterior Architecture
         exterior_prompt = (
-            f"Stunning breathtaking luxury {style} villa exterior, {plot_size} sqft, ${budget} budget. {prompt}. "
-            f"Award-winning modern architecture, glowing warm golden hour ambient lighting, lush green landscaped gardens, "
-            f"crystal clear water reflections, dramatic sky, high-end residential estate, hyper-realistic, photorealistic, 8k resolution, architectural magazine cover"
+            f"Stunning photorealistic architectural photograph of a luxury {style} house exterior, {plot_size} sqft, ${budget} budget. {prompt}. "
+            f"Modern architectural design, beautiful daytime golden sunlight, landscaped lawn with trees and outdoor patio, crisp sharp 8k resolution, architectural digest"
         )
 
-        # 2. Interior Living Room Render
+        # 2. High-End Interior Living Room
         interior_prompt = (
-            f"Luxurious spacious {style} living room interior design, {plot_size} sqft residence. {prompt}. "
-            f"High ceiling, large floor-to-ceiling glass windows overlooking garden, ultra-premium Italian designer furniture, "
-            f"warm cozy ambient lighting, marble and hardwood finishes, elegant aesthetic, Architectural Digest featured, 8k resolution, photorealistic masterpiece"
+            f"Stunning photorealistic interior design photography of a spacious luxury {style} living room, {plot_size} sqft house. {prompt}. "
+            f"Open concept living area, elegant modern sofa, large windows with natural sunlight, hardwood and marble floors, high-end interior styling, 8k resolution"
         )
         
-        # 3. 3D Architectural Cutaway Model / Isometric Architectural Floorplan
+        # 3. Comprehensive Multi-Room 3D Architectural Floor Plan
         floorplan_prompt = (
-            f"3D architectural cutaway model of a modern {style} house floor plan layout, {plot_size} sqft, {prompt}. "
-            f"Isometric elevated perspective view, complete house with roof removed to display full interior layout. "
-            f"Clean solid white structural partition walls with black trim, light wooden parquet flooring, fully furnished living room with sofa, "
-            f"master bedroom with double bed, modern bathroom with ceramic tub, kitchen with island, outdoor wooden terrace deck with garden patio. "
-            f"Architectural miniature model visualization on neutral clean background, soft natural studio lighting, crisp sharp edges, ultra high quality 3D architectural rendering"
+            f"Full 3D architectural floor plan layout of a complete {plot_size} sqft {style} house, {prompt}. "
+            f"Multi-room residential blueprint cutaway rendered in 3D with entire roof removed: "
+            f"showing master bedroom with bed, second bedroom, large living room with sofa and TV, kitchen with dining table, full bathroom with bathtub, and outdoor balcony terrace. "
+            f"Thick solid structural walls dividing all rooms, wooden plank flooring, fully furnished rooms visible from above, clean sharp architectural visualization, 8k resolution, high quality 3D floorplan render"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
@@ -116,23 +113,20 @@ class AIEngineService:
 
         if image_type == "exterior":
             prompt = (
-                f"Stunning breathtaking luxury {style} villa exterior, {plot_size} sqft, ${budget} budget. {prompt_str}. "
-                f"Award-winning modern architecture, glowing warm golden hour ambient lighting, lush green landscaped gardens, "
-                f"crystal clear water reflections, dramatic sky, high-end residential estate, hyper-realistic, photorealistic, 8k resolution, architectural magazine cover"
+                f"Stunning photorealistic architectural photograph of a luxury {style} house exterior, {plot_size} sqft, ${budget} budget. {prompt_str}. "
+                f"Modern architectural design, beautiful daytime golden sunlight, landscaped lawn with trees and outdoor patio, crisp sharp 8k resolution, architectural digest"
             )
         elif image_type == "interior":
             prompt = (
-                f"Luxurious spacious {style} living room interior design, {plot_size} sqft residence. {prompt_str}. "
-                f"High ceiling, large floor-to-ceiling glass windows overlooking garden, ultra-premium Italian designer furniture, "
-                f"warm cozy ambient lighting, marble and hardwood finishes, elegant aesthetic, Architectural Digest featured, 8k resolution, photorealistic masterpiece"
+                f"Stunning photorealistic interior design photography of a spacious luxury {style} living room, {plot_size} sqft house. {prompt_str}. "
+                f"Open concept living area, elegant modern sofa, large windows with natural sunlight, hardwood and marble floors, high-end interior styling, 8k resolution"
             )
         else:  # "3d"
             prompt = (
-                f"3D architectural cutaway model of a modern {style} house floor plan layout, {plot_size} sqft, {prompt_str}. "
-                f"Isometric elevated perspective view, complete house with roof removed to display full interior layout. "
-                f"Clean solid white structural partition walls with black trim, light wooden parquet flooring, fully furnished living room with sofa, "
-                f"master bedroom with double bed, modern bathroom with ceramic tub, kitchen with island, outdoor wooden terrace deck with garden patio. "
-                f"Architectural miniature model visualization on neutral clean background, soft natural studio lighting, crisp sharp edges, ultra high quality 3D architectural rendering"
+                f"Full 3D architectural floor plan layout of a complete {plot_size} sqft {style} house, {prompt_str}. "
+                f"Multi-room residential blueprint cutaway rendered in 3D with entire roof removed: "
+                f"showing master bedroom with bed, second bedroom, large living room with sofa and TV, kitchen with dining table, full bathroom with bathtub, and outdoor balcony terrace. "
+                f"Thick solid structural walls dividing all rooms, wooden plank flooring, fully furnished rooms visible from above, clean sharp architectural visualization, 8k resolution, high quality 3D floorplan render"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
