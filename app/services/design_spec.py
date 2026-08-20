@@ -94,7 +94,12 @@ def parse_master_design_specification(
                 bedrooms = val
                 break
 
-    bathrooms = max(1, min(bedrooms, 4))
+    # Default bathrooms based on scale if unspecified
+    if "compact" in p or "small" in p or "budget" in p or bedrooms <= 2:
+        bathrooms = 1
+    else:
+        bathrooms = max(1, min(bedrooms, 3))
+        
     bath_match = re.search(r'(\d+)\s*(?:bathroom|bath\s*room|bath)', p)
     if bath_match:
         bathrooms = int(bath_match.group(1))
@@ -150,14 +155,14 @@ def parse_master_design_specification(
     else:
         windows = "expansive contemporary glass windows"
 
-    if any(kw in p for kw in ["terracotta roof", "clay roof", "sloped tile", "tiled roof", "mangalore tile"]):
+    if any(kw in p for kw in ["terracotta roof", "clay roof", "sloped tile", "tiled roof", "mangalore tile", "tiled sloping roof", "sloping roof", "sloping tile"]):
         roof = "sloping terracotta tile roof"
     elif any(kw in p for kw in ["pitched roof", "sloped roof", "gable roof", "gable"]):
         roof = "pitched gable roof"
     elif any(kw in p for kw in ["flat roof", "flat contemporary", "rooftop terrace"]):
         roof = "flat contemporary roof with terrace"
     else:
-        roof = "flat contemporary roof" if style in ["Modern Luxury", "Minimalist Scandinavian", "Modern Industrial"] else "sloped pitched roof"
+        roof = "sloping terracotta tile roof" if style == "Traditional Indian" else ("flat contemporary roof" if style in ["Modern Luxury", "Minimalist Scandinavian", "Modern Industrial"] else "sloped pitched roof")
 
     doors = "grand pivot wooden entrance door"
     if "carved" in p or "traditional" in p:
