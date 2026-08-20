@@ -59,23 +59,29 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        """
-        Exact original 100% submission prompts that generated the original lavender and submission houses.
-        """
         exterior_prompt = f"Photorealistic exterior architectural render, {style} style house, {plot_size} sqft, ${budget} budget. {prompt}. Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k"
         interior_prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt}. Wide angle shot, professional interior photography, ultra detailed, 8k"
-        floorplan_prompt = f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. The roof is completely removed to reveal all interior rooms from directly above. Camera looking straight down at 90 degrees, orthographic projection. Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt}"
+        
+        # Strictly top-down blueprint/diorama architectural cutaway layout
+        floorplan_prompt = (
+            f"top-down bird's-eye view 90 degree architectural floor plan model, full house layout cutaway from directly above, "
+            f"orthographic aerial shot, roof completely removed showing entire house floorplan blueprint with multiple rooms, "
+            f"thick dark cut walls, distinct furnished bedrooms, living room, bathrooms, wood floors, clean layout, "
+            f"surrounding trees outside perimeter. {style} house. {prompt}. "
+            f"no ceiling, no perspective room view, no interior eye level view, no walls blocking camera, architectural 3D layout render"
+        )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Exact original single master seed
+        # Use independent seed for floorplan so it doesn't try to render an eye-level room from the interior seed
         master_seed = random.randint(1, 1000000)
+        fp_seed = random.randint(1, 1000000)
 
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={fp_seed}&model=flux&enhance=true"
 
         spec = parse_design_spec(prompt, style, budget, plot_size)
 
@@ -89,9 +95,6 @@ class AIEngineService:
 
     @staticmethod
     async def regenerate_single_image(image_type: str, spec: dict, seed: int = None):
-        """
-        Regenerate single image with exact original prompts.
-        """
         if seed is None:
             seed = random.randint(1, 1000000)
 
@@ -105,16 +108,19 @@ class AIEngineService:
         elif image_type == "interior":
             prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt_str}. Wide angle shot, professional interior photography, ultra detailed, 8k"
         else:  # "3d"
-            prompt = f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. The roof is completely removed to reveal all interior rooms from directly above. Camera looking straight down at 90 degrees, orthographic projection. Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt_str}"
+            prompt = (
+                f"top-down bird's-eye view 90 degree architectural floor plan model, full house layout cutaway from directly above, "
+                f"orthographic aerial shot, roof completely removed showing entire house floorplan blueprint with multiple rooms, "
+                f"thick dark cut walls, distinct furnished bedrooms, living room, bathrooms, wood floors, clean layout, "
+                f"surrounding trees outside perimeter. {style} house. {prompt_str}. "
+                f"no ceiling, no perspective room view, no interior eye level view, no walls blocking camera, architectural 3D layout render"
+            )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
         return {"url": url, "seed": seed}
 
     @staticmethod
     async def generate_cost_estimate(plot_size: int, budget: int, style: str, prompt: str):
-        """
-        Uses free Pollinations Text API to generate a detailed JSON cost breakdown.
-        """
         from openai import AsyncOpenAI
         import json
 
