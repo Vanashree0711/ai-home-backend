@@ -59,38 +59,38 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # Ultra HD Exterior prompt with photorealistic octane rendering keywords
+        # Ultra-Aesthetic Luxury Architectural Exterior
         exterior_prompt = (
-            f"masterpiece, best quality, ultra high resolution 8k, photorealistic architectural photography of a luxury {style} house exterior, {plot_size} sqft, ${budget} budget. "
-            f"{prompt}. "
-            f"shot on Hasselblad H6D-100c, 35mm architectural lens, crisp sharp focus, natural daylight, raytracing reflections, photorealistic foliage and landscaping, no blur, unreal engine 5 architecture render, archdaily featured"
+            f"Stunning breathtaking luxury {style} villa exterior, {plot_size} sqft, ${budget} budget. {prompt}. "
+            f"Award-winning modern architecture, glowing warm golden hour ambient lighting, lush green landscaped gardens, "
+            f"crystal clear water reflections, dramatic sky, high-end residential estate, hyper-realistic, photorealistic, 8k resolution, architectural magazine cover"
         )
 
-        # Ultra HD Interior prompt
+        # Ultra-Aesthetic Luxury Architectural Interior
         interior_prompt = (
-            f"masterpiece, best quality, ultra high resolution 8k, photorealistic luxury interior design magazine photography of an expansive living room in a {style} house, {plot_size} sqft. "
-            f"{prompt}. "
-            f"shot on Canon EOS R5 24mm tilt-shift lens, soft ambient warm lighting, photorealistic textures, clean sharp reflections, modern designer furniture, architectural digest interior, crisp sharp details"
+            f"Luxurious spacious {style} living room interior design, {plot_size} sqft residence. {prompt}. "
+            f"High ceiling, large floor-to-ceiling glass windows overlooking garden, ultra-premium Italian designer furniture, "
+            f"warm cozy ambient lighting, marble and hardwood finishes, elegant aesthetic, Architectural Digest featured, 8k resolution, photorealistic masterpiece"
         )
         
-        # Ultra HD Top-Down 3D Floorplan
+        # 3D Orthographic Top-Down Cutaway Architecture
         floorplan_prompt = (
-            f"masterpiece, best quality, ultra high resolution 8k, clean 3D architectural top-down floor plan model, full house layout cutaway from directly above, "
-            f"strictly 90 degree orthographic top-down view, bird's-eye aerial view, entire roof completely sliced away to reveal all furnished interior rooms, "
-            f"thick dark charcoal cut walls, warm wooden floors, furnished bedrooms, modern bathrooms, kitchen and living room, clean architectural visualization diorama, "
-            f"crisp sharp lines, beautiful soft studio lighting, high detail, V-Ray render, archdaily plan. {style} style house. {prompt}"
+            f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
+            f"The roof is completely removed to reveal all interior rooms from directly above. "
+            f"Camera looking straight down at 90 degrees, orthographic projection. "
+            f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+            f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt}"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Separate seeds for clean rendering
+        # Independent seeds for maximum visual beauty and clarity
         seed_ext = random.randint(1, 1000000)
         seed_int = random.randint(1, 1000000)
         seed_fp  = random.randint(1, 1000000)
 
-        # High resolution 1024x1024 flux rendering
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={seed_ext}&model=flux&enhance=true"
         int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={seed_int}&model=flux&enhance=true"
         fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={seed_fp}&model=flux&enhance=true"
@@ -117,22 +117,23 @@ class AIEngineService:
 
         if image_type == "exterior":
             prompt = (
-                f"masterpiece, best quality, ultra high resolution 8k, photorealistic architectural photography of a luxury {style} house exterior, {plot_size} sqft, ${budget} budget. "
-                f"{prompt_str}. "
-                f"shot on Hasselblad H6D-100c, 35mm architectural lens, crisp sharp focus, natural daylight, raytracing reflections, photorealistic foliage and landscaping, no blur, unreal engine 5 architecture render, archdaily featured"
+                f"Stunning breathtaking luxury {style} villa exterior, {plot_size} sqft, ${budget} budget. {prompt_str}. "
+                f"Award-winning modern architecture, glowing warm golden hour ambient lighting, lush green landscaped gardens, "
+                f"crystal clear water reflections, dramatic sky, high-end residential estate, hyper-realistic, photorealistic, 8k resolution, architectural magazine cover"
             )
         elif image_type == "interior":
             prompt = (
-                f"masterpiece, best quality, ultra high resolution 8k, photorealistic luxury interior design magazine photography of an expansive living room in a {style} house, {plot_size} sqft. "
-                f"{prompt_str}. "
-                f"shot on Canon EOS R5 24mm tilt-shift lens, soft ambient warm lighting, photorealistic textures, clean sharp reflections, modern designer furniture, architectural digest interior, crisp sharp details"
+                f"Luxurious spacious {style} living room interior design, {plot_size} sqft residence. {prompt_str}. "
+                f"High ceiling, large floor-to-ceiling glass windows overlooking garden, ultra-premium Italian designer furniture, "
+                f"warm cozy ambient lighting, marble and hardwood finishes, elegant aesthetic, Architectural Digest featured, 8k resolution, photorealistic masterpiece"
             )
         else:  # "3d"
             prompt = (
-                f"masterpiece, best quality, ultra high resolution 8k, clean 3D architectural top-down floor plan model, full house layout cutaway from directly above, "
-                f"strictly 90 degree orthographic top-down view, bird's-eye aerial view, entire roof completely sliced away to reveal all furnished interior rooms, "
-                f"thick dark charcoal cut walls, warm wooden floors, furnished bedrooms, modern bathrooms, kitchen and living room, clean architectural visualization diorama, "
-                f"crisp sharp lines, beautiful soft studio lighting, high detail, V-Ray render, archdaily plan. {style} style house. {prompt_str}"
+                f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
+                f"The roof is completely removed to reveal all interior rooms from directly above. "
+                f"Camera looking straight down at 90 degrees, orthographic projection. "
+                f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+                f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt_str}"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
