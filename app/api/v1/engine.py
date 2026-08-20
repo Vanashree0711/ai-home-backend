@@ -31,11 +31,12 @@ async def generate_project(req: GenerationRequest, background_tasks: BackgroundT
     5. Saves everything to DB.
     """
     try:
-        # 1. Trigger Image Generation (Exterior, Interior, Floor Plan)
+        # 1. Generate Images directly from user prompt using free Pollinations API
         image_urls = await AIEngineService.generate_images(req.prompt, req.style, req.budget, req.plot_size)
-        
-        # 2. Trigger Cost & Material Analysis (JSON)
+
+        # 2. Generate Cost & Material Analysis using free Pollinations LLM
         analysis_text = await AIEngineService.generate_cost_estimate(req.plot_size, req.budget, req.style, req.prompt)
+
         
         import json
         try:

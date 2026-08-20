@@ -1,4 +1,3 @@
-import asyncio
 import json
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
@@ -6,6 +5,7 @@ from openai import AsyncOpenAI
 
 router = APIRouter()
 
+# Use 100% free Pollinations LLM - no API key needed
 client = AsyncOpenAI(
     api_key="pollinations",
     base_url="https://text.pollinations.ai/openai"
@@ -16,7 +16,15 @@ async def stream_ai_architect(prompt: str):
         response = await client.chat.completions.create(
             model="openai",
             messages=[
-                {"role": "system", "content": "You are an expert AI Architect and Interior Designer. Provide concise, professional, and highly creative advice on home design, materials, layout, and architecture."},
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an expert AI Architect and Interior Designer with 20 years of experience. "
+                        "Provide concise, professional, highly detailed, and creative advice on home design, "
+                        "building materials, structural engineering, interior layout, and architecture. "
+                        "Always give practical, specific recommendations. Be helpful and thorough."
+                    )
+                },
                 {"role": "user", "content": prompt}
             ],
             stream=True
