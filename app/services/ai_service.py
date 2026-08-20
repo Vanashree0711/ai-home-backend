@@ -11,34 +11,39 @@ class AIEngineService:
         import random
         import urllib.parse
 
-        # Build prompts directly from user input - clean and simple
+        # USER PROMPT IS THE MAIN DRIVER - put it first and most prominently
         exterior_prompt = (
-            f"Photorealistic exterior architectural render, {style} style house, "
-            f"{plot_size} sqft, ${budget} budget. {prompt}. "
-            f"Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k resolution, no cartoon, no drawing"
+            f"{prompt}. "
+            f"This is a {style} style home, {plot_size} sqft, built with a ${budget} budget. "
+            f"Photorealistic exterior architectural render. Professional architectural photography. "
+            f"Beautiful landscaping, realistic materials, ultra detailed, cinematic lighting, 8k resolution. "
+            f"No cartoon, no illustration, no sketch, no generic building."
         )
 
         interior_prompt = (
-            f"Photorealistic interior architectural render, {style} style living room, "
-            f"{plot_size} sqft house. {prompt}. "
-            f"Wide angle shot, professional interior photography, soft natural light, ultra detailed, 8k resolution, no cartoon, no drawing"
+            f"{prompt}. "
+            f"This is the interior living room of a {style} style home, {plot_size} sqft. "
+            f"Photorealistic interior architectural photography. "
+            f"Wide angle shot showing the full room, professional staging, soft natural light, "
+            f"ultra detailed, realistic furniture and materials, 8k resolution. "
+            f"No cartoon, no illustration, no empty room."
         )
 
         floorplan_prompt = (
-            f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a "
-            f"{plot_size} sqft house in {style} style. "
-            f"The roof is completely removed to reveal all interior rooms from directly above. "
-            f"Camera looking straight down at 90 degrees, orthographic projection. "
-            f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-            f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, "
-            f"vibrant realistic colors, contrasting walls. {prompt}"
+            f"Photorealistic 3D architectural top-down floor plan of a {style} style house, {plot_size} sqft. "
+            f"Based on this design: {prompt}. "
+            f"The roof is completely removed showing all interior rooms from directly above at 90 degrees. "
+            f"Orthographic top-down camera. Thick dark charcoal walls. "
+            f"Warm lighting inside rooms, hardwood floors, realistic furniture visible from above, "
+            f"vibrant colors, highly detailed luxury visualization. "
+            f"No hallway perspective, no corridor view, no first-person view."
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Use a single master seed to enforce style consistency across all 3 images
+        # Use a single master seed for style consistency across all 3 images
         master_seed = random.randint(1, 1000000)
 
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
