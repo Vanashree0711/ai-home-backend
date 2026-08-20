@@ -1,5 +1,5 @@
 """
-Specialized Architectural Image Prompt Engine (Stage 3 Refined)
+Specialized Architectural Image Prompt Engine (Stage 3 Complete)
 ==============================================================
 Transforms a Master Design Specification into synchronized, specialized prompts
 for Exterior, Interior, and Photorealistic 3D Layout Visualizations.
@@ -39,27 +39,28 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
         if "oak" in mat: wood_tone = "natural light oak timber"
         elif "teak" in mat: wood_tone = "handcrafted teak wood"
         elif "cedar" in mat: wood_tone = "rich cedar timber"
-        elif "walnut" in mat: wood_tone = "natural walnut wood"
+        elif "walnut" in mat: wood_tone = "natural walnut wood accents"
 
     stone_type = "natural stone cladding"
     for mat in materials:
         if "brick" in mat: stone_type = "exposed brickwork"
-        elif "slate" in mat: stone_type = "dark slate stone"
+        elif "slate" in mat: stone_type = "dark grey slate stone"
         elif "travertine" in mat: stone_type = "warm travertine stone"
-        elif "granite" in mat: stone_type = "charcoal granite"
+        elif "granite" in mat: stone_type = "dark charcoal stone"
         elif "marble" in mat: stone_type = "polished marble"
+        elif "grey" in mat or "gray" in mat or "dark" in mat: stone_type = "dark grey natural stone"
 
     windows = ext.get("windows", "large black-framed floor-to-ceiling glass windows")
     roof = ext.get("roof", "flat contemporary roof")
     doors = ext.get("doors", "grand pivot wooden entrance door")
     flooring = interior.get("flooring", "large-format polished Italian marble")
-    lighting = interior.get("lighting", "warm indirect 3000K architectural LED cove lighting")
+    lighting = interior.get("lighting", "warm indirect 3000K architectural LED lighting")
     furniture = interior.get("furniture", f"contemporary {style} designer furniture")
 
     # Landscape & Features
     features_list = []
-    if ext.get("pool"): features_list.append("crystal-clear swimming pool with sun deck")
-    if ext.get("garden"): features_list.append("landscaped garden with manicured lawn and ornamental trees")
+    if ext.get("pool"): features_list.append("rectangular swimming pool with sun deck")
+    if ext.get("garden"): features_list.append("landscaped garden with green lawn")
     if ext.get("balcony"): features_list.append("upper-level glass railing balcony")
     if ext.get("parking"): features_list.append("two-car covered parking carport")
     if ext.get("courtyard"): features_list.append("central open-air courtyard")
@@ -100,20 +101,18 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
 def build_exterior_prompt(spec: Dict[str, Any]) -> str:
     """
     1. EXTERIOR CONCEPT:
-    Front / three-quarter front perspective, eye-level architectural photography of the complete house.
-    Strictly preserves floors, facade palette, materials, roof, entrance, windows, balcony, and landscape amenities.
+    Wide three-quarter front architectural view from a distance with generous margins on all sides.
+    Ensures the complete house is visible without close cropping.
     """
     id_dna = synthesize_design_identity(spec)
 
     prompt = (
-        f"A masterwork photorealistic architectural photograph of a {id_dna['floors_label']} {id_dna['style']} {id_dna['house_type']}, {id_dna['plot_size']} sqft. "
-        f"Perspective: three-quarter front eye-level architectural photography, complete building visible with realistic architectural proportions. "
-        f"Facade design: finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}. "
-        f"Structure & Details: exact {id_dna['floors_label']} home, clearly visible entrance with {id_dna['doors']}, {id_dna['windows']}, {id_dna['roof']}. "
-        f"Grounds & Environment: {id_dna['features_str']}. "
-        f"Requirements: {id_dna['original_prompt']}. "
-        f"Visual standard: high resolution, HD quality, realistic materials, realistic glass reflections, realistic lighting and soft shadows, natural daytime environment, luxury real-estate photography, 8k resolution. "
-        f"Negative: cartoon, sketch, painting, fantasy building, distorted architecture, extra floors, random windows, random balconies, unrealistic proportions, floating objects, blurry image, text, watermark"
+        f"Wide-angle architectural photograph of a luxury {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
+        f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green manicured lawn in foreground, open sky above, never cropped, no close-ups. "
+        f"Facade: finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}, {id_dna['windows']}, clearly visible entrance with {id_dna['doors']}, {id_dna['roof']}. "
+        f"Grounds: {id_dna['features_str']}. "
+        f"Visual standard: high resolution, HD, luxury real-estate photography, natural bright daytime sunlight, crisp reflections, realistic shadows, 8k resolution. "
+        f"Negative: close-up, cropped house, tight shot, cut off edges, cartoon, sketch, painting, fantasy building, distorted architecture, extra floors, blurry, text, watermark"
     )
     return prompt
 
@@ -121,18 +120,17 @@ def build_exterior_prompt(spec: Dict[str, Any]) -> str:
 def build_interior_prompt(spec: Dict[str, Any]) -> str:
     """
     2. INTERIOR CONCEPT:
-    Eye-level interior architectural photography (24-28mm wide-angle feel, straight vertical lines, no extreme fisheye).
+    Eye-level interior architectural photography (24mm wide angle, straight verticals).
     Inherits the exact design identity (colors, wood tones, stone accents, window trims, lighting language) from the Master Design Specification.
     """
     id_dna = synthesize_design_identity(spec)
 
     prompt = (
-        f"A masterwork photorealistic interior architectural photograph of the main living room and modular kitchen inside the SAME {id_dna['floors_label']} {id_dna['style']} residence. "
-        f"Camera: eye-level interior architectural photography, 24-28mm realistic wide-angle lens feel, straight vertical lines, realistic room scale and proportions. "
+        f"Eye-level architectural photograph of the expansive main living room and open modular kitchen inside the SAME luxury {id_dna['floors_label']} {id_dna['style']} residence. "
+        f"Camera: 24mm wide-angle interior architectural photography, straight vertical lines, realistic room scale and proportions. "
         f"Synchronized identity: interior walls in {id_dna['primary_color']}, custom millwork and wall paneling in {id_dna['wood_tone']}, {id_dna['stone_type']} feature accent wall. "
-        f"Finishes: {id_dna['flooring']}, {id_dna['windows']} matching exterior facade with views of the garden, {id_dna['lighting']}. "
+        f"Finishes: {id_dna['flooring']}, {id_dna['windows']} matching exterior facade with views of the garden and pool, {id_dna['lighting']}. "
         f"Furnishing: {id_dna['furniture']}, matching neutral and {id_dna['secondary_color']} accents. "
-        f"Requirements: {id_dna['original_prompt']}. "
         f"Visual standard: high resolution, HD, luxurious, clean, realistic, architecturally believable, soft ambient natural daylight, 8k resolution, Architectural Digest photography. "
         f"Negative: cartoon, sketch, mismatched architectural style, rustic wooden cabin, generic hotel lobby, distorted furniture, fisheye distortion, low quality, blurry, text, watermark"
     )
@@ -142,23 +140,22 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
     3. PHOTOREALISTIC 3D LAYOUT:
-    Top-down isometric cutaway 3D architectural floor plan with roof removed.
-    Shows walls, rooms, bedrooms, living room, kitchen, bathrooms, dining area, corridors, doors, windows, furniture, and surrounding grounds.
+    Photorealistic top-down isometric cutaway 3D architectural house visualization with roof removed.
+    Shows fully furnished interior rooms, realistic materials, and surrounding landscape.
     """
     id_dna = synthesize_design_identity(spec)
 
-    rooms_breakdown = f"{id_dna['bedrooms']} bedrooms with beds, {id_dna['bathrooms']} bathrooms with fixtures, spacious living room with sofa set, modular kitchen with dining area and island, corridors and doors"
+    rooms_breakdown = f"{id_dna['bedrooms']} bedrooms with beds, {id_dna['bathrooms']} bathrooms with tubs and showers, spacious living room with sofa set, modular kitchen with marble island and dining table, hallways and wooden doors"
     if id_dna['has_courtyard']: rooms_breakdown += ", central open courtyard"
     if id_dna['has_balcony']: rooms_breakdown += ", upper terrace balcony"
 
     prompt = (
-        f"A masterwork photorealistic 3D architectural top-down isometric cutaway floor plan visualization of the SAME {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
-        f"Perspective: top-down isometric elevated cutaway with roof removed to clearly reveal the complete interior layout from above: displaying {rooms_breakdown}. "
-        f"Architectural palette: exterior walls in {id_dna['primary_color']}, solid structural partition walls with dark charcoal top fill, {id_dna['flooring']}, {id_dna['wood_tone']} interior doors and cabinetry. "
-        f"Furnishing & Detail: fully furnished with beds, sofas, dining table, kitchen counters, bathroom tub and sink, indoor plants, and surrounding {id_dna['features_str']}. "
-        f"Requirements: {id_dna['original_prompt']}. "
-        f"Visual standard: premium 3D architectural rendering, photorealistic materials, realistic lighting and soft ambient shadows, clean CAD geometry, high detail, HD resolution, professional architectural visualization. "
-        f"Negative: eye-level perspective room view, ceiling on, single empty room, technical 2D wireframe drawing, blurry geometry, distorted walls, low resolution, cartoon, text, watermark"
+        f"Stunning photorealistic 3D architectural cutaway floor plan visualization of the SAME luxury {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
+        f"Perspective: elevated top-down isometric cutaway view with roof removed to clearly display the complete fully furnished interior layout from above: {rooms_breakdown}. "
+        f"Materials & Palette: exterior walls in {id_dna['primary_color']}, {id_dna['wood_tone']} interior doors and cabinetry, {id_dna['stone_type']} accents, {id_dna['flooring']}. "
+        f"Furnishing: fully furnished with luxury beds, modern sofa, dining table, kitchen island, bathroom fixtures, indoor potted plants, and surrounding outdoor {id_dna['features_str']}. "
+        f"Visual standard: photorealistic 3D diorama cutaway rendering, realistic materials, warm ambient lighting, realistic soft shadows, high detail, HD resolution, Architectural Digest 3D presentation. "
+        f"Negative: blank white model, grey CAD render, technical wireframe, simple floor plan, eye-level perspective room view, ceiling present, single empty room, monochromatic, blurry geometry, low resolution, text, watermark"
     )
     return prompt
 
