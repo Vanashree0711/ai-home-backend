@@ -59,40 +59,40 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # 1. Exterior Architecture: User prompt FIRST to guarantee 100% adherence
+        # 1. Master Seed for consistent house palette & textures across all 3 views
+        master_seed = random.randint(1, 1000000)
+
+        # 2. Consistent visual identity shared across all 3 prompts
+        theme_anchor = f"{style} home with design requirements: {prompt}"
+
+        # 3. Exterior View of THIS house
         exterior_prompt = (
-            f"{prompt}. "
-            f"Stunning photorealistic architectural photograph of the exterior of this {style} home, {plot_size} sqft, ${budget} budget. "
-            f"High-end architecture, daytime natural sunlight, realistic landscaping and environment, professional architectural photography, sharp 8k resolution"
+            f"Stunning photorealistic architectural photograph of the exterior of a {theme_anchor}, {plot_size} sqft, ${budget} budget. "
+            f"Front elevation view showing exterior facade, windows, entry door, roofline, outdoor landscaping, daylight natural lighting, 8k resolution"
         )
 
-        # 2. Interior Living Space: User prompt FIRST
+        # 4. Interior View of THIS SAME house
         interior_prompt = (
-            f"{prompt}. "
-            f"Stunning photorealistic interior design photography of the living room inside this {style} home, {plot_size} sqft. "
-            f"Matching architectural style, elegant modern furniture, large windows with natural daylight, photorealistic textures, 8k resolution"
+            f"Stunning photorealistic interior photography of the living room inside the SAME {theme_anchor}, {plot_size} sqft. "
+            f"Matching color palette and architectural materials, large windows matching exterior, modern luxury furniture, natural ambient daylight, 8k resolution"
         )
         
-        # 3. 3D Top-Down Multi-Room Floor Plan Layout: User prompt FIRST
+        # 5. 3D Top-Down Floor Plan of THIS SAME house (matching reference: orthographic bird's-eye architectural 3D cutaway)
         floorplan_prompt = (
-            f"{prompt}. "
-            f"3D architectural top-down floor plan layout of the entire {plot_size} sqft {style} house, "
-            f"complete residence with roof removed showing all rooms from directly above: "
-            f"furnished bedrooms, living room, kitchen, dining area, bathrooms, and terrace. "
-            f"Thick dark partition walls, hardwood flooring, clean 3D architectural blueprint visualization, crisp sharp lines, 8k resolution"
+            f"Photorealistic 3D architectural floor plan layout of the SAME {theme_anchor}, {plot_size} sqft residence. "
+            f"Bird's-eye top-down view looking straight down from 90 degrees with the roof sliced away to show full interior layout: "
+            f"multiple furnished bedrooms with beds, living room with sofas and coffee table, dining room with chairs, kitchen with countertops, tiled bathrooms with tub, hardwood and tile floors, beige cut partition walls. "
+            f"Stock photo 3D architectural render, clean sharp CAD floorplan rendering, 8k resolution"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        seed_ext = random.randint(1, 1000000)
-        seed_int = random.randint(1, 1000000)
-        seed_fp  = random.randint(1, 1000000)
-
-        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={seed_ext}&model=flux&enhance=true"
-        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={seed_int}&model=flux&enhance=true"
-        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={seed_fp}&model=flux&enhance=true"
+        # Generate all 3 images with unified master_seed to lock in visual consistency
+        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
 
         spec = parse_design_spec(prompt, style, budget, plot_size)
 
@@ -101,7 +101,7 @@ class AIEngineService:
             "interior_url": int_url,
             "floorplan_url": fp_url,
             "spec": spec,
-            "seed": seed_ext,
+            "seed": master_seed,
         }
 
     @staticmethod
@@ -113,26 +113,24 @@ class AIEngineService:
         style = spec["house"]["architectural_style"]
         budget = spec["house"]["budget_usd"]
         plot_size = spec["house"]["plot_size_sqft"]
+        theme_anchor = f"{style} home with design requirements: {prompt_str}"
 
         if image_type == "exterior":
             prompt = (
-                f"{prompt_str}. "
-                f"Stunning photorealistic architectural photograph of the exterior of this {style} home, {plot_size} sqft, ${budget} budget. "
-                f"High-end architecture, daytime natural sunlight, realistic landscaping and environment, professional architectural photography, sharp 8k resolution"
+                f"Stunning photorealistic architectural photograph of the exterior of a {theme_anchor}, {plot_size} sqft, ${budget} budget. "
+                f"Front elevation view showing exterior facade, windows, entry door, roofline, outdoor landscaping, daylight natural lighting, 8k resolution"
             )
         elif image_type == "interior":
             prompt = (
-                f"{prompt_str}. "
-                f"Stunning photorealistic interior design photography of the living room inside this {style} home, {plot_size} sqft. "
-                f"Matching architectural style, elegant modern furniture, large windows with natural daylight, photorealistic textures, 8k resolution"
+                f"Stunning photorealistic interior photography of the living room inside the SAME {theme_anchor}, {plot_size} sqft. "
+                f"Matching color palette and architectural materials, large windows matching exterior, modern luxury furniture, natural ambient daylight, 8k resolution"
             )
         else:  # "3d"
             prompt = (
-                f"{prompt_str}. "
-                f"3D architectural top-down floor plan layout of the entire {plot_size} sqft {style} house, "
-                f"complete residence with roof removed showing all rooms from directly above: "
-                f"furnished bedrooms, living room, kitchen, dining area, bathrooms, and terrace. "
-                f"Thick dark partition walls, hardwood flooring, clean 3D architectural blueprint visualization, crisp sharp lines, 8k resolution"
+                f"Photorealistic 3D architectural floor plan layout of the SAME {theme_anchor}, {plot_size} sqft residence. "
+                f"Bird's-eye top-down view looking straight down from 90 degrees with the roof sliced away to show full interior layout: "
+                f"multiple furnished bedrooms with beds, living room with sofas and coffee table, dining room with chairs, kitchen with countertops, tiled bathrooms with tub, hardwood and tile floors, beige cut partition walls. "
+                f"Stock photo 3D architectural render, clean sharp CAD floorplan rendering, 8k resolution"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
