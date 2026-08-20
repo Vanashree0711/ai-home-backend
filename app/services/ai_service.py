@@ -59,29 +59,41 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        exterior_prompt = f"Photorealistic exterior architectural render, {style} style house, {plot_size} sqft, ${budget} budget. {prompt}. Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k"
-        interior_prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt}. Wide angle shot, professional interior photography, ultra detailed, 8k"
+        # Ultra HD Exterior prompt with photorealistic octane rendering keywords
+        exterior_prompt = (
+            f"masterpiece, best quality, ultra high resolution 8k, photorealistic architectural photography of a luxury {style} house exterior, {plot_size} sqft, ${budget} budget. "
+            f"{prompt}. "
+            f"shot on Hasselblad H6D-100c, 35mm architectural lens, crisp sharp focus, natural daylight, raytracing reflections, photorealistic foliage and landscaping, no blur, unreal engine 5 architecture render, archdaily featured"
+        )
+
+        # Ultra HD Interior prompt
+        interior_prompt = (
+            f"masterpiece, best quality, ultra high resolution 8k, photorealistic luxury interior design magazine photography of an expansive living room in a {style} house, {plot_size} sqft. "
+            f"{prompt}. "
+            f"shot on Canon EOS R5 24mm tilt-shift lens, soft ambient warm lighting, photorealistic textures, clean sharp reflections, modern designer furniture, architectural digest interior, crisp sharp details"
+        )
         
-        # Strictly top-down blueprint/diorama architectural cutaway layout
+        # Ultra HD Top-Down 3D Floorplan
         floorplan_prompt = (
-            f"top-down bird's-eye view 90 degree architectural floor plan model, full house layout cutaway from directly above, "
-            f"orthographic aerial shot, roof completely removed showing entire house floorplan blueprint with multiple rooms, "
-            f"thick dark cut walls, distinct furnished bedrooms, living room, bathrooms, wood floors, clean layout, "
-            f"surrounding trees outside perimeter. {style} house. {prompt}. "
-            f"no ceiling, no perspective room view, no interior eye level view, no walls blocking camera, architectural 3D layout render"
+            f"masterpiece, best quality, ultra high resolution 8k, clean 3D architectural top-down floor plan model, full house layout cutaway from directly above, "
+            f"strictly 90 degree orthographic top-down view, bird's-eye aerial view, entire roof completely sliced away to reveal all furnished interior rooms, "
+            f"thick dark charcoal cut walls, warm wooden floors, furnished bedrooms, modern bathrooms, kitchen and living room, clean architectural visualization diorama, "
+            f"crisp sharp lines, beautiful soft studio lighting, high detail, V-Ray render, archdaily plan. {style} style house. {prompt}"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Use independent seed for floorplan so it doesn't try to render an eye-level room from the interior seed
-        master_seed = random.randint(1, 1000000)
-        fp_seed = random.randint(1, 1000000)
+        # Separate seeds for clean rendering
+        seed_ext = random.randint(1, 1000000)
+        seed_int = random.randint(1, 1000000)
+        seed_fp  = random.randint(1, 1000000)
 
-        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={fp_seed}&model=flux&enhance=true"
+        # High resolution 1024x1024 flux rendering
+        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={seed_ext}&model=flux&enhance=true"
+        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={seed_int}&model=flux&enhance=true"
+        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={seed_fp}&model=flux&enhance=true"
 
         spec = parse_design_spec(prompt, style, budget, plot_size)
 
@@ -90,7 +102,7 @@ class AIEngineService:
             "interior_url": int_url,
             "floorplan_url": fp_url,
             "spec": spec,
-            "seed": master_seed,
+            "seed": seed_ext,
         }
 
     @staticmethod
@@ -104,16 +116,23 @@ class AIEngineService:
         plot_size = spec["house"]["plot_size_sqft"]
 
         if image_type == "exterior":
-            prompt = f"Photorealistic exterior architectural render, {style} style house, {plot_size} sqft, ${budget} budget. {prompt_str}. Daytime golden hour lighting, professional architectural photography, ultra detailed, 8k"
+            prompt = (
+                f"masterpiece, best quality, ultra high resolution 8k, photorealistic architectural photography of a luxury {style} house exterior, {plot_size} sqft, ${budget} budget. "
+                f"{prompt_str}. "
+                f"shot on Hasselblad H6D-100c, 35mm architectural lens, crisp sharp focus, natural daylight, raytracing reflections, photorealistic foliage and landscaping, no blur, unreal engine 5 architecture render, archdaily featured"
+            )
         elif image_type == "interior":
-            prompt = f"Photorealistic interior render, {style} style living room, {plot_size} sqft house. {prompt_str}. Wide angle shot, professional interior photography, ultra detailed, 8k"
+            prompt = (
+                f"masterpiece, best quality, ultra high resolution 8k, photorealistic luxury interior design magazine photography of an expansive living room in a {style} house, {plot_size} sqft. "
+                f"{prompt_str}. "
+                f"shot on Canon EOS R5 24mm tilt-shift lens, soft ambient warm lighting, photorealistic textures, clean sharp reflections, modern designer furniture, architectural digest interior, crisp sharp details"
+            )
         else:  # "3d"
             prompt = (
-                f"top-down bird's-eye view 90 degree architectural floor plan model, full house layout cutaway from directly above, "
-                f"orthographic aerial shot, roof completely removed showing entire house floorplan blueprint with multiple rooms, "
-                f"thick dark cut walls, distinct furnished bedrooms, living room, bathrooms, wood floors, clean layout, "
-                f"surrounding trees outside perimeter. {style} house. {prompt_str}. "
-                f"no ceiling, no perspective room view, no interior eye level view, no walls blocking camera, architectural 3D layout render"
+                f"masterpiece, best quality, ultra high resolution 8k, clean 3D architectural top-down floor plan model, full house layout cutaway from directly above, "
+                f"strictly 90 degree orthographic top-down view, bird's-eye aerial view, entire roof completely sliced away to reveal all furnished interior rooms, "
+                f"thick dark charcoal cut walls, warm wooden floors, furnished bedrooms, modern bathrooms, kitchen and living room, clean architectural visualization diorama, "
+                f"crisp sharp lines, beautiful soft studio lighting, high detail, V-Ray render, archdaily plan. {style} style house. {prompt_str}"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
