@@ -3,19 +3,15 @@ import urllib.parse
 
 def parse_design_spec(prompt: str, style: str, budget: int, plot_size: int) -> dict:
     """
-    Extracts a design spec so the frontend UI does not crash,
-    but we keep it completely separate from prompt generation.
+    Extracts design specification for the frontend UI.
     """
     p = prompt.lower()
-    
-    # Floors
     floors = 2
     if any(kw in p for kw in ["single floor", "one floor", "1 floor", "bungalow"]):
         floors = 1
     elif any(kw in p for kw in ["three floor", "3 floor", "three storey"]):
         floors = 3
         
-    # Bedrooms / Bathrooms
     bedrooms = 3
     for i in range(6, 0, -1):
         if f"{i} bedroom" in p or f"{i} bhk" in p:
@@ -28,7 +24,6 @@ def parse_design_spec(prompt: str, style: str, budget: int, plot_size: int) -> d
             bathrooms = i
             break
 
-    # Materials
     materials = []
     if "wood" in p or "walnut" in p or "oak" in p:
         materials.append("Natural Wood")
@@ -68,24 +63,34 @@ class AIEngineService:
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
         """
-        Generates Exterior, Interior and Floor Plan using the exact, original July 10th prompts.
-        This fixes prompt dilution and restores the original image quality.
+        Generates Exterior, Interior and 3D top view by putting the user prompt FIRST.
+        Uses independent seeds to prevent floorplan geometry from warping the exterior render.
         """
-        # Exact original July 10th prompts
-        exterior_prompt = f"A photorealistic exterior architectural render of a {plot_size} sqft house. Budget constraints: ${budget}. Style: {style}. {prompt}. Professional lighting, 8k resolution"
-        interior_prompt = f"A photorealistic interior architectural render of a living room for a {plot_size} sqft house. Style: {style}. {prompt}. Professional lighting"
-        floorplan_prompt = f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. The roof is completely removed to reveal all interior rooms from directly above. Camera looking straight down at 90 degrees, orthographic projection. Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt}"
+        # User prompt is placed FIRST to maximize keyword adherence (e.g. lake, color, etc.)
+        exterior_prompt = f"{prompt}, photorealistic exterior architectural render of a {style} style house, {plot_size} sqft, budget ${budget}. Professional lighting, ultra-detailed, 8k resolution"
+        interior_prompt = f"{prompt}, photorealistic interior architectural render of a living room inside a {style} style house, {plot_size} sqft. Professional lighting, ultra-detailed, 8k resolution"
+        
+        # 3D layout prompt optimized with user prompt first
+        floorplan_prompt = (
+            f"{prompt}, photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
+            f"The roof is completely removed to reveal all interior rooms from directly above. "
+            f"Camera looking straight down at 90 degrees, orthographic projection. "
+            f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+            f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls."
+        )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Single master seed for consistency
-        master_seed = random.randint(1, 1000000)
+        # Use independent seeds to prevent layout leakage / low quality
+        seed_ext = random.randint(1, 1000000)
+        seed_int = random.randint(1, 1000000)
+        seed_fp  = random.randint(1, 1000000)
 
-        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={seed_ext}&model=flux&enhance=true"
+        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={seed_int}&model=flux&enhance=true"
+        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={seed_fp}&model=flux&enhance=true"
 
         spec = parse_design_spec(prompt, style, budget, plot_size)
 
@@ -94,13 +99,13 @@ class AIEngineService:
             "interior_url": int_url,
             "floorplan_url": fp_url,
             "spec": spec,
-            "seed": master_seed,
+            "seed": seed_ext, # returned as reference
         }
 
     @staticmethod
     async def regenerate_single_image(image_type: str, spec: dict, seed: int = None):
         """
-        Regenerate individual images using the exact, original July 10th prompts.
+        Regenerate single image with updated user-first prompt structure.
         """
         if seed is None:
             seed = random.randint(1, 1000000)
@@ -111,11 +116,17 @@ class AIEngineService:
         plot_size = spec["house"]["plot_size_sqft"]
 
         if image_type == "exterior":
-            prompt = f"A photorealistic exterior architectural render of a {plot_size} sqft house. Budget constraints: ${budget}. Style: {style}. {prompt_str}. Professional lighting, 8k resolution"
+            prompt = f"{prompt_str}, photorealistic exterior architectural render of a {style} style house, {plot_size} sqft, budget ${budget}. Professional lighting, ultra-detailed, 8k resolution"
         elif image_type == "interior":
-            prompt = f"A photorealistic interior architectural render of a living room for a {plot_size} sqft house. Style: {style}. {prompt_str}. Professional lighting"
+            prompt = f"{prompt_str}, photorealistic interior architectural render of a living room inside a {style} style house, {plot_size} sqft. Professional lighting, ultra-detailed, 8k resolution"
         else:  # "3d"
-            prompt = f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. The roof is completely removed to reveal all interior rooms from directly above. Camera looking straight down at 90 degrees, orthographic projection. Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. {prompt_str}"
+            prompt = (
+                f"{prompt_str}, photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
+                f"The roof is completely removed to reveal all interior rooms from directly above. "
+                f"Camera looking straight down at 90 degrees, orthographic projection. "
+                f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+                f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls."
+            )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
         return {"url": url, "seed": seed}
