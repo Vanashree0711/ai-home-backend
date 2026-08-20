@@ -8,7 +8,7 @@ from reportlab.lib.colors import HexColor
 
 class PDFGenerator:
     @staticmethod
-    def _download_temp_image(url: str, max_retries: int = 5) -> str:
+    def _download_temp_image(url: str, max_retries: int = 3) -> str:
         """Download an image URL to a temp file with retries for lazy-generated images."""
         if not url:
             return None
@@ -21,7 +21,7 @@ class PDFGenerator:
         for attempt in range(max_retries):
             try:
                 print(f"PDF image download attempt {attempt + 1}/{max_retries}: {url[:80]}...")
-                with httpx.Client(timeout=90.0, headers=headers, follow_redirects=True) as client:
+                with httpx.Client(timeout=20.0, headers=headers, follow_redirects=True) as client:
                     response = client.get(url)
                 
                 # If server returned an error, retry after delay
@@ -72,13 +72,18 @@ class PDFGenerator:
         c = canvas.Canvas(output_path, pagesize=letter)
         width, height = letter
         
-        print("=== Starting PDF Image Downloads (Sequential) ===")
-        # Download images sequentially with a tiny spacing to prevent rate limiting
-        ext_path = PDFGenerator._download_temp_image(data.get("exterior_image"))
-        time.sleep(0.5)
-        int_path = PDFGenerator._download_temp_image(data.get("interior_image"))
-        time.sleep(0.5)
-        fp_path = PDFGenerator._download_temp_image(data.get("floorplan_image"))
+        import concurrent.futures
+
+        print("=== Starting PDF Image Downloads (Parallel) ===")
+        # Download images concurrently using a thread pool to avoid sequential blocking
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            future_ext = executor.submit(PDFGenerator._download_temp_image, data.get("exterior_image"))
+            future_int = executor.submit(PDFGenerator._download_temp_image, data.get("interior_image"))
+            future_fp = executor.submit(PDFGenerator._download_temp_image, data.get("floorplan_image"))
+            
+            ext_path = future_ext.result()
+            int_path = future_int.result()
+            fp_path = future_fp.result()
         
         print(f"Download results: ext={ext_path is not None}, int={int_path is not None}, fp={fp_path is not None}")
 
