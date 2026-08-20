@@ -66,17 +66,21 @@ class AIEngineService:
         Generates Exterior, Interior and 3D top view by putting the user prompt FIRST.
         Uses independent seeds to prevent floorplan geometry from warping the exterior render.
         """
-        # User prompt is placed FIRST to maximize keyword adherence (e.g. lake, color, etc.)
-        exterior_prompt = f"{prompt}, photorealistic exterior architectural render of a {style} style house, {plot_size} sqft, budget ${budget}. Professional lighting, ultra-detailed, 8k resolution"
-        interior_prompt = f"{prompt}, photorealistic interior architectural render of a living room inside a {style} style house, {plot_size} sqft. Professional lighting, ultra-detailed, 8k resolution"
+        # Exterior: user prompt first for scene adherence (e.g. lake, landscape)
+        exterior_prompt = f"{prompt}. A photorealistic exterior architectural render of a {style} style house, {plot_size} sqft, budget ${budget}. Professional architectural photography, beautiful daytime natural lighting, ultra-detailed, 8k resolution"
         
-        # 3D layout prompt optimized with user prompt first
+        # Interior: living room staged inside the same house
+        interior_prompt = f"{prompt}. A photorealistic interior architectural render of a living room inside a {style} style house, {plot_size} sqft. Professional interior photography, soft natural lighting, elegant modern furniture, ultra-detailed, 8k resolution"
+        
+        # 3D Architecture: strictly top-down orthographic cutaway floor plan matching the user's reference layout
         floorplan_prompt = (
-            f"{prompt}, photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
+            f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
             f"The roof is completely removed to reveal all interior rooms from directly above. "
             f"Camera looking straight down at 90 degrees, orthographic projection. "
             f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-            f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls."
+            f"Warm inviting lighting, hardwood floors, furnished bedrooms, modern bathrooms, kitchen and living spaces visible from above. "
+            f"Highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. "
+            f"Design theme and color requirements: {prompt}"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
@@ -116,16 +120,18 @@ class AIEngineService:
         plot_size = spec["house"]["plot_size_sqft"]
 
         if image_type == "exterior":
-            prompt = f"{prompt_str}, photorealistic exterior architectural render of a {style} style house, {plot_size} sqft, budget ${budget}. Professional lighting, ultra-detailed, 8k resolution"
+            prompt = f"{prompt_str}. A photorealistic exterior architectural render of a {style} style house, {plot_size} sqft, budget ${budget}. Professional architectural photography, beautiful daytime natural lighting, ultra-detailed, 8k resolution"
         elif image_type == "interior":
-            prompt = f"{prompt_str}, photorealistic interior architectural render of a living room inside a {style} style house, {plot_size} sqft. Professional lighting, ultra-detailed, 8k resolution"
+            prompt = f"{prompt_str}. A photorealistic interior architectural render of a living room inside a {style} style house, {plot_size} sqft. Professional interior photography, soft natural lighting, elegant modern furniture, ultra-detailed, 8k resolution"
         else:  # "3d"
             prompt = (
-                f"{prompt_str}, photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
+                f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of a {plot_size} sqft house in {style} style. "
                 f"The roof is completely removed to reveal all interior rooms from directly above. "
                 f"Camera looking straight down at 90 degrees, orthographic projection. "
                 f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
-                f"Warm inviting lighting, hardwood floors, highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls."
+                f"Warm inviting lighting, hardwood floors, furnished bedrooms, modern bathrooms, kitchen and living spaces visible from above. "
+                f"Highly detailed luxury architectural visualization, vibrant realistic colors, contrasting walls. "
+                f"Design theme and color requirements: {prompt_str}"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
