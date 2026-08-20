@@ -7,8 +7,13 @@ from app.db.base_class import Base
 from app.db.session import engine
 from app.models import schema # Ensure models are loaded
 
-# Create all database tables
-Base.metadata.create_all(bind=engine)
+# Create all database tables (gracefully catch errors if database is offline/unreachable)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("Database tables verified/created successfully.")
+except Exception as e:
+    print(f"Warning: Database connection failed during startup: {e}")
+    print("Backend will continue running in local storage fallback mode.")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
