@@ -59,37 +59,41 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # 1. Master Seed for consistent house palette & textures across all 3 views
+        # 1. Master seed to enforce color and geometric consistency across all 3 views
         master_seed = random.randint(1, 1000000)
 
-        # 2. Consistent visual identity shared across all 3 prompts
-        theme_anchor = f"{style} home with design requirements: {prompt}"
-
-        # 3. Exterior View of THIS house
+        # 2. Exterior Concept: Clean modern architectural render matching reference photo
         exterior_prompt = (
-            f"Stunning photorealistic architectural photograph of the exterior of a {theme_anchor}, {plot_size} sqft, ${budget} budget. "
-            f"Front elevation view showing exterior facade, windows, entry door, roofline, outdoor landscaping, daylight natural lighting, 8k resolution"
+            f"A photorealistic exterior architectural render of a {plot_size} sqft house in {style} style. "
+            f"Budget constraints: ${budget}. {prompt}. "
+            f"Front elevation view showing clean architectural facade, large floor-to-ceiling glass windows with warm indoor lighting visible inside, "
+            f"balcony with glass railing, modern geometry, beautiful landscaping with garden plants, soft natural daylight and twilight glow, "
+            f"professional architectural photography, 8k resolution"
         )
 
-        # 4. Interior View of THIS SAME house
+        # 3. Interior Concept: Warm ambient living space matching the exterior house
         interior_prompt = (
-            f"Stunning photorealistic interior photography of the living room inside the SAME {theme_anchor}, {plot_size} sqft. "
-            f"Matching color palette and architectural materials, large windows matching exterior, modern luxury furniture, natural ambient daylight, 8k resolution"
+            f"A photorealistic interior architectural render of the modern living room inside the SAME {style} house, {plot_size} sqft. "
+            f"{prompt}. "
+            f"Large floor-to-ceiling glass windows matching the exterior architecture, soft warm ambient lighting, elegant modern sofa, "
+            f"matching wall color palette and textures, professional architectural digest photography, 8k resolution"
         )
         
-        # 5. 3D Top-Down Floor Plan of THIS SAME house (matching reference: orthographic bird's-eye architectural 3D cutaway)
+        # 4. 3D Architectural Top-Down View: Exact full-house floor plan layout
         floorplan_prompt = (
-            f"Photorealistic 3D architectural floor plan layout of the SAME {theme_anchor}, {plot_size} sqft residence. "
-            f"Bird's-eye top-down view looking straight down from 90 degrees with the roof sliced away to show full interior layout: "
-            f"multiple furnished bedrooms with beds, living room with sofas and coffee table, dining room with chairs, kitchen with countertops, tiled bathrooms with tub, hardwood and tile floors, beige cut partition walls. "
-            f"Stock photo 3D architectural render, clean sharp CAD floorplan rendering, 8k resolution"
+            f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of the SAME {plot_size} sqft house in {style} style. "
+            f"The roof is completely removed to reveal all interior rooms from directly above. "
+            f"Camera looking straight down at 90 degrees, orthographic projection. "
+            f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+            f"Warm inviting lighting, hardwood floors, furnished bedrooms, modern bathrooms, kitchen and living spaces. "
+            f"Vibrant realistic colors matching the house theme: {prompt}"
         )
 
         safe_exterior = urllib.parse.quote(exterior_prompt)
         safe_interior = urllib.parse.quote(interior_prompt)
         safe_floorplan = urllib.parse.quote(floorplan_prompt)
 
-        # Generate all 3 images with unified master_seed to lock in visual consistency
+        # Unified settings across all three images
         ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
         fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
@@ -113,24 +117,30 @@ class AIEngineService:
         style = spec["house"]["architectural_style"]
         budget = spec["house"]["budget_usd"]
         plot_size = spec["house"]["plot_size_sqft"]
-        theme_anchor = f"{style} home with design requirements: {prompt_str}"
 
         if image_type == "exterior":
             prompt = (
-                f"Stunning photorealistic architectural photograph of the exterior of a {theme_anchor}, {plot_size} sqft, ${budget} budget. "
-                f"Front elevation view showing exterior facade, windows, entry door, roofline, outdoor landscaping, daylight natural lighting, 8k resolution"
+                f"A photorealistic exterior architectural render of a {plot_size} sqft house in {style} style. "
+                f"Budget constraints: ${budget}. {prompt_str}. "
+                f"Front elevation view showing clean architectural facade, large floor-to-ceiling glass windows with warm indoor lighting visible inside, "
+                f"balcony with glass railing, modern geometry, beautiful landscaping with garden plants, soft natural daylight and twilight glow, "
+                f"professional architectural photography, 8k resolution"
             )
         elif image_type == "interior":
             prompt = (
-                f"Stunning photorealistic interior photography of the living room inside the SAME {theme_anchor}, {plot_size} sqft. "
-                f"Matching color palette and architectural materials, large windows matching exterior, modern luxury furniture, natural ambient daylight, 8k resolution"
+                f"A photorealistic interior architectural render of the modern living room inside the SAME {style} house, {plot_size} sqft. "
+                f"{prompt_str}. "
+                f"Large floor-to-ceiling glass windows matching the exterior architecture, soft warm ambient lighting, elegant modern sofa, "
+                f"matching wall color palette and textures, professional architectural digest photography, 8k resolution"
             )
         else:  # "3d"
             prompt = (
-                f"Photorealistic 3D architectural floor plan layout of the SAME {theme_anchor}, {plot_size} sqft residence. "
-                f"Bird's-eye top-down view looking straight down from 90 degrees with the roof sliced away to show full interior layout: "
-                f"multiple furnished bedrooms with beds, living room with sofas and coffee table, dining room with chairs, kitchen with countertops, tiled bathrooms with tub, hardwood and tile floors, beige cut partition walls. "
-                f"Stock photo 3D architectural render, clean sharp CAD floorplan rendering, 8k resolution"
+                f"A photorealistic 3D architectural top-down floor plan layout showing the complete interior of the SAME {plot_size} sqft house in {style} style. "
+                f"The roof is completely removed to reveal all interior rooms from directly above. "
+                f"Camera looking straight down at 90 degrees, orthographic projection. "
+                f"Thick structural interior walls with a solid dark charcoal slice-cut top fill, making wall divisions easily identifiable. "
+                f"Warm inviting lighting, hardwood floors, furnished bedrooms, modern bathrooms, kitchen and living spaces. "
+                f"Vibrant realistic colors matching the house theme: {prompt_str}"
             )
 
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
