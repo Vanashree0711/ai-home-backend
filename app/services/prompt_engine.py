@@ -1,9 +1,13 @@
 """
 Specialized Architectural Image Prompt Engine (Master Blueprint Driven - HD Enhanced)
 =====================================================================================
-Derives Exterior, Interior, and 3D Floor Plan representations directly from
+Derives Exterior, Interior, and 3D Interior Floor Plan representations directly from
 the immutable Master House Design Specification with Ultra-HD 8K photographic fidelity.
-Calibrated to the exact Scandinavian Simplicity & Functionality single-storey / two-storey archetype.
+
+Guarantees:
+1. Exterior View = Professional architectural photograph of the house exterior.
+2. Interior View = Eye-level interior photograph inside the main living room.
+3. 3D Interior Plan = Top-down 3D photorealistic interior cutaway showing ONLY the inside furnished rooms.
 """
 
 from typing import Dict, Any, List
@@ -168,23 +172,22 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D FLOOR PLAN (Ultra HD 8K):
-    90-degree straight overhead bird's-eye architectural 3D cutaway of the SAME house layout.
-    Shows entry porch, central living room, open dining, kitchen with island, master bedroom with walk-in wardrobe,
-    secondary bedrooms, bathrooms, and rear terrace deck.
+    C. 3D INTERIOR FLOOR PLAN / CUTAWAY (Ultra HD 8K):
+    Photorealistic 3D interior floor cutaway looking STRICTLY inside the furnished rooms from above with NO ROOF.
+    Shows the interior rooms, furniture, beds, sofas, kitchen island, dining table, and bathrooms.
     """
     id_dna = synthesize_design_identity(spec)
 
     staircase_spatial = f"and {id_dna['staircase']}, " if id_dna['floors'] > 1 else ""
 
     prompt = (
-        f"Ultra-HD 8k photorealistic 3D architectural floor plan visualization of the ENTIRE {id_dna['floors_label']} {id_dna['style']} home layout, {id_dna['plot_size']} sqft. "
-        f"Perspective: full-property 90-degree straight overhead bird's-eye view showing the complete entire house layout with roof removed from wall to wall. "
-        f"Floor Plan Layout: front entry porch at bottom center opening into central living room with sofa and wooden coffee table, central dining area with wooden dining table and 6 chairs, open kitchen on left with island counter, rear outdoor terrace deck with dining table at top. "
-        f"Bedroom & Bathroom Wings: master bedroom suite on left with walk-in wardrobe and en-suite bath, 2 secondary bedrooms on right (Bedroom 2 and Bedroom 3), modern tiled bathrooms with sinks and toilets, and laundry room. {staircase_spatial}"
-        f"Finishes & Walls: thick solid clean white boundary walls, {id_dna['flooring']} throughout all living, dining, and bedroom areas, light grey tiled bathrooms, indoor potted green plants. "
-        f"Lighting & Rendering: soft overhead natural daylight with realistic soft shadows, ultra-detailed 3D architectural floor plan presentation, 8k resolution. "
-        f"Negative: low quality, blurry, pixelated, jpeg artifacts, ceiling on, eye-level perspective, flat 2D blueprint, black and white CAD drawing, wireframe, text, watermark"
+        f"Ultra-HD 8k photorealistic 3D interior cutaway floor plan of the SAME {id_dna['floors_label']} {id_dna['style']} residence interior layout, {id_dna['plot_size']} sqft. "
+        f"Perspective: top-down elevated isometric view looking directly inside the furnished interior rooms with roof completely removed, no ceiling. "
+        f"Interior Room Arrangement: central living room with sofa set and wooden coffee table, open dining area with wooden dining table and chairs, open kitchen with marble countertop and island counter, "
+        f"master bedroom with double bed and nightstands, {id_dna['bedrooms'] - 1} secondary bedrooms with made beds, and {id_dna['bathrooms']} modern bathrooms with glass shower, toilet, and vanity sink. {staircase_spatial}"
+        f"Interior Materials & Finishes: {id_dna['flooring']} across all living and bedroom areas, clean white interior partition walls with doorway openings, and indoor potted plants. "
+        f"Lighting & Rendering: warm soft indoor lighting and natural daylight illuminating the room interiors from above, ultra-detailed 3D architectural interior visualization, 8k resolution. "
+        f"Negative: exterior building, outside facade of house, roof present, ceiling on, outdoor yard, sky, street, low quality, blurry, pixelated, 2D black and white blueprint, wireframe, text, watermark"
     )
     return prompt
 
