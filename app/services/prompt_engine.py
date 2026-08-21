@@ -1,19 +1,23 @@
 """
-Intelligent Prompt Engine — Locked 3-View Reference Archetype v3
-================================================================
-Guarantees 100% architectural match across all 3 views derived from the user's reference images:
+Intelligent Prompt Engine — Exact 1:1 Reference Archetype v4
+============================================================
+Derives Exterior, Interior, and 3D Layout 100% matched to the user's uploaded reference image (media_1787337986379.png):
 
-1. EXTERIOR: 2-storey modern cubic house with soft lilac/lavender smooth render walls,
-   black-framed floor-to-ceiling glass wall on ground floor, upper glass balcony terrace,
-   and lavender flower bushes along the front foundation.
+1. EXTERIOR: Two-storey modern cubic luxury residence with soft lilac/lavender smooth render walls,
+   black-framed floor-to-ceiling glass wall on ground floor, upper glass balcony terrace, and lavender flower bushes.
 
-2. INTERIOR: Living room inside the SAME house with soft lilac/lavender matte walls,
-   light natural blonde oak wide-plank wood flooring, cream white modular sofa, white coffee table,
-   framed minimalist wall art, and floor-to-ceiling glass window showing lavender bushes outside.
+2. INTERIOR: Living room inside the SAME house with soft lilac/lavender walls, light blonde oak wide-plank wood flooring,
+   cream white modular sofa, white coffee table, framed wall art, and floor-to-ceiling glass window showing lavender bushes.
 
-3. 3D FLOOR PLAN: Exact straight overhead 90-degree top-down 3D architectural view of the ENTIRE home interior,
-   showing all rooms from wall to wall, thick dark black perimeter walls, SAME light blonde oak wood plank flooring,
-   cream sofa in living room, purple/lavender bedspreads in bedrooms, and tiled bathrooms.
+3. 3D LAYOUT (EXACT REFERENCE REPRODUCTION):
+   - 90-degree straight top-down overhead architectural cutaway of the ENTIRE square floor plan with NO roof.
+   - Thick solid black outer boundary walls framing the square layout on all 4 sides.
+   - Vertical blonde wood plank flooring running continuously across all living and bedroom areas.
+   - Purple/lavender fabric bedsheets on the left-side bedroom beds and purple central accent floor rug.
+   - Office desk with black office chair in top center section.
+   - Tiled bathrooms with glass showers in top-right corner.
+   - Warm golden sunlight streaming diagonally across the wood floor from top-right.
+   - Dense green tree foliage bordering the black exterior walls on left, right, and top edges.
 """
 
 from typing import Dict, Any
@@ -21,7 +25,7 @@ from typing import Dict, Any
 
 def build_exterior_prompt(spec: Dict[str, Any]) -> str:
     """
-    A. EXTERIOR VIEW — Matched 1:1 to Reference Image 1.
+    A. EXTERIOR CONCEPT — Matched to reference image 1.
     """
     plot_size = spec.get("plot_size_sqft", 2500)
 
@@ -41,7 +45,7 @@ def build_exterior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_interior_prompt(spec: Dict[str, Any]) -> str:
     """
-    B. INTERIOR VIEW — Matched 1:1 to Reference Image 2.
+    B. INTERIOR CONCEPT — Matched to reference image 2.
     """
     prompt = (
         "Ultra-HD 8K photorealistic interior architectural photograph inside the main living room of the SAME modern luxury residence. "
@@ -60,23 +64,25 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D ARCHITECTURAL FLOOR PLAN CUTAWAY — Exact straight top-down view of ENTIRE home interior layout.
+    C. PHOTOREALISTIC 3D LAYOUT — Exact reproduction of reference image media_1787337986379.png.
     """
     plot_size = spec.get("plot_size_sqft", 2500)
 
     prompt = (
-        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway of the ENTIRE modern home layout, {plot_size} sqft. "
-        f"Perspective: exact straight overhead 90-degree top-down bird's-eye architectural 3D view looking directly down inside the ENTIRE home interior showing all rooms simultaneously from wall to wall, roof completely removed. "
-        f"Perimeter Walls: thick dark black exterior perimeter walls enclosing the entire square house layout, clean white interior partition walls with doorway openings. "
-        f"Complete Room Distribution & Furnishing across the entire home: "
-        f"BOTTOM CENTER — front entry porch leading into central living room with cream white modular sofa, white coffee table, and soft lilac lavender wall accent; "
-        f"TOP CENTER — open kitchen with marble island counter and dining area with wooden table and chairs; "
-        f"LEFT WING — two bedrooms with purple lavender bedspreads and a shared tiled bathroom; "
-        f"RIGHT WING — primary bedroom suite with double bed, en-suite bathroom with glass shower, and laundry room. "
-        f"Flooring & Finishes: light natural blonde oak wood plank flooring running continuously throughout all living and bedroom areas of the entire home layout, identical to the interior view. "
-        f"Lighting & Surroundings: warm indoor ambient lights casting directional soft shadows on the oak floors, green trees and foliage framing the dark exterior boundary walls. "
-        f"Quality: professional 3D architectural rendering of the complete house layout, crisp textures, soft ambient occlusion, 8K resolution. "
-        f"Negative: eye-level view, angled view, exterior facade photo, roof covering rooms, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
+        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway of the ENTIRE square house layout, {plot_size} sqft, exact 1:1 match to reference render. "
+        f"Perspective: 90-degree straight top-down overhead bird's-eye architectural view looking directly down inside the entire square floor plan with roof completely removed. "
+        f"Outer Boundary & Perimeter: thick solid black exterior boundary walls enclosing the square house footprint on all four sides. "
+        f"Flooring: vertical light blonde oak wood plank flooring running continuously across all room spaces. "
+        f"Specific Furnishings & Room Elements: "
+        f"LEFT SIDE — two bedrooms featuring purple lavender fabric bed sheets on beds, with a white tiled bathroom between them; "
+        f"CENTER — large purple floor area rug on the blonde wood floor, with central living room and wooden coffee table; "
+        f"TOP CENTER — home office workstation desk with a black swivel office chair; "
+        f"TOP RIGHT — tiled bathroom suite with glass walk-in shower and white sanitary fixtures; "
+        f"BOTTOM CENTER — entry foyer wooden floor porch with indoor potted green plants. "
+        f"Lighting & Shadows: warm golden sunlight streaming diagonally across the wood floor from the top right, casting long directional soft shadows. "
+        f"Exterior Surroundings: dense green tree foliage bordering the black exterior walls on the left, right, and top edges against a soft grey backdrop. "
+        f"Quality: professional 3D architectural rendering, crisp wood plank textures, soft ambient occlusion, 8K resolution. "
+        f"Negative: eye-level view, angled isometric perspective, exterior facade photo, roof on, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
     )
     return prompt
 
@@ -84,7 +90,7 @@ def build_3d_prompt(spec: Dict[str, Any]) -> str:
 def generate_all_specialized_prompts(spec: Dict[str, Any]) -> Dict[str, str]:
     """
     Main Entry Point — Converts Master Specification into 3 synchronized prompts
-    matched to the user's 3 reference images.
+    matched to the user's reference images.
     """
     return {
         "exterior_prompt": build_exterior_prompt(spec),
