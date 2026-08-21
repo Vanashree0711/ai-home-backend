@@ -1,17 +1,20 @@
 """
-Intelligent Prompt Engine — AI Architect + 3D Visualizer v2
-============================================================
-Transforms the Master House Specification into 3 photorealistic HD prompts
-that describe the EXACT SAME HOUSE from 3 different viewpoints.
+Intelligent Prompt Engine — Locked 3-View Reference Archetype v3
+================================================================
+Derives Exterior, Interior, and 3D Floor Plan directly from the user's
+uploaded 3 reference images (Lavender-tinged Modern Cubic Residence):
 
-Pipeline:
-  MASTER SPECIFICATION → [EXTERIOR PROMPT + INTERIOR PROMPT + 3D DOLLHOUSE PROMPT]
+Image 1 (Exterior): Two-storey modern cubic volume with soft lilac/lavender smooth render walls,
+  upper glass-balcony terrace, floor-to-ceiling glass sliding doors on ground level showing interior warm glow,
+  glass-railed upper windows, dark metal door trims, low lavender shrubbery landscaping in front.
 
-Guarantees:
-  - All 3 prompts share identical architecture, colors, materials, floors, and style
-  - Environment (lake, ocean, mountain) appears in Exterior and Interior view
-  - 3D Floor Plan shows all furnished rooms from top-down architectural cutaway view matching the user reference
-  - Style DNA drives every material, color, and atmosphere decision
+Image 2 (Interior): Modern living room inside the same home with soft lavender/lilac matte walls,
+  light oak hardwood floors, cream modular sofa set, white coffee table, large framed artwork on wall,
+  large floor-to-ceiling glass window on right looking out to lavender bushes and trees, warm natural sunlight.
+
+Image 3 (3D Floor Plan): 90-degree top-down architectural floor plan cutaway showing the entire layout,
+  dark thick perimeter walls, light oak wood plank flooring throughout, purple/lavender accent rug and bedspreads,
+  fully furnished living room, master bedroom, guest rooms, tiled bathrooms, surrounded by green trees and foliage.
 """
 
 from typing import Dict, Any
@@ -19,160 +22,75 @@ from typing import Dict, Any
 
 def build_exterior_prompt(spec: Dict[str, Any]) -> str:
     """
-    A. EXTERIOR VIEW — Full architectural photograph of the house outside.
-    The building, its surroundings, and the environment must all be visible.
+    A. EXTERIOR VIEW — Matched 1:1 to Reference Image 1.
     """
-    dna = spec.get("style_dna", {})
-    ext = spec.get("exterior", {})
     style = spec.get("architectural_style", "Modern Luxury")
-    floors_label = f"{spec['floors']}-storey" if spec["floors"] > 1 else "single-storey"
-    house_type = spec.get("house_type", "Luxury Residence")
-    environment = spec.get("environment", "landscaped residential grounds")
-    primary = ext.get("primary_color", dna.get("facade_color", "warm white"))
-    secondary = ext.get("secondary_color", dna.get("accent_color", "natural wood"))
-    materials = ", ".join(ext.get("materials", dna.get("materials_ext", ["render", "glass"])))
-    windows = ext.get("windows", dna.get("windows", "large glass windows"))
-    doors = ext.get("doors", dna.get("door", "entrance door"))
-    roof = ext.get("roof", dna.get("roof", "flat contemporary roof"))
+    floors = spec.get("floors", 2)
+    floors_label = f"{floors}-storey" if floors > 1 else "single-storey"
     plot_size = spec.get("plot_size_sqft", 2500)
-    atmosphere = dna.get("atmosphere", "premium residential")
-    landscape = dna.get("landscape", "manicured grounds")
-    env_tag = spec.get("env_tag", "suburban")
-
-    # Build feature list
-    features = []
-    if ext.get("pool"): features.append("a sparkling rectangular swimming pool with timber deck")
-    if ext.get("garden") or env_tag == "suburban": features.append(landscape)
-    if ext.get("balcony"): features.append("upper-level glass-railed balcony")
-    if ext.get("parking"): features.append("double covered carport or garage")
-    if ext.get("courtyard"): features.append("central open-air courtyard")
-    if ext.get("porch"): features.append("covered entrance verandah")
-    features_str = ", ".join(features) if features else landscape
-
-    # Environment clause — must appear beside/around the house
-    env_clause = f"The house is situated on {environment}."
+    environment = spec.get("environment", "landscaped residential grounds")
 
     prompt = (
-        f"Ultra-HD 8K photorealistic professional architectural exterior photograph of a {floors_label} {style} {house_type}, {plot_size} sqft. "
-        f"Perspective: full-property symmetric front or three-quarter view from ground level, complete building visible from foundation to roofline, generous sky above and grounds below, never cropped. "
-        f"Architecture: {primary} facade with {secondary} accents, {materials}, {windows}, {doors}, {roof}. "
-        f"{env_clause} "
-        f"Grounds and landscape: {features_str}. "
-        f"Atmosphere: {atmosphere}, soft natural daylight with realistic shadows and reflections. "
-        f"Quality: Hasselblad H6D-100c medium format camera, sharp crisp focus, 8K resolution, photorealistic textures and materials, architectural photography. "
-        f"Negative: cropped building, aerial drone view, close-up detail only, interior visible, multiple buildings, cartoon, sketch, watermark, text, blurry, low quality"
+        f"Ultra-HD 8K photorealistic architectural exterior photograph of a modern two-storey cubic luxury house, {plot_size} sqft. "
+        f"Perspective: eye-level full front view of the two-storey modern cubic building, centered in frame, complete house visible from ground to roof, no cropping. "
+        f"Exterior Architecture: clean modern cubic geometric volume with smooth matte light lilac lavender tinted plaster render walls, "
+        f"upper floor features a glass-railed balcony terrace with large black-framed glass sliding doors, "
+        f"ground floor features expansive floor-to-ceiling glass wall with black frames revealing warm interior lighting inside, "
+        f"flat roofline with clean shadow gap. "
+        f"Landscaping: low purple lavender flower bushes and green shrubs planted along the front foundation, manicured lawn, trees in background, soft evening twilight sky. "
+        f"Quality: Hasselblad H6D-100c medium format camera, sharp architectural focus, soft realistic illumination, 8K resolution. "
+        f"Negative: cropped building, dark moody cave, rustic brick, old traditional house, cartoon, sketch, watermark, text, blurry, low quality"
     )
     return prompt
 
 
 def build_interior_prompt(spec: Dict[str, Any]) -> str:
     """
-    B. INTERIOR VIEW — Eye-level photograph inside the main living space of this exact house.
-    Must reflect the same materials, colors, architecture, and environment as the exterior.
+    B. INTERIOR VIEW — Matched 1:1 to Reference Image 2.
     """
-    dna = spec.get("style_dna", {})
-    interior = spec.get("interior", {})
-    ext = spec.get("exterior", {})
     style = spec.get("architectural_style", "Modern Luxury")
-    floors_label = f"{spec['floors']}-storey" if spec["floors"] > 1 else "single-storey"
-    house_type = spec.get("house_type", "Luxury Residence")
-    environment = spec.get("environment", "landscaped grounds")
-    env_tag = spec.get("env_tag", "suburban")
-
-    flooring = interior.get("flooring", dna.get("flooring", "natural hardwood"))
-    walls_int = interior.get("walls_int", dna.get("walls_int", "smooth painted walls"))
-    ceiling = interior.get("ceiling", dna.get("ceiling", "smooth ceiling"))
-    furniture = interior.get("furniture", dna.get("furniture", "contemporary designer furniture"))
-    lighting = interior.get("lighting", dna.get("lighting", "warm natural daylight"))
-    windows_int = interior.get("windows_int", dna.get("windows", "large glass windows"))
-    materials_int = ", ".join(interior.get("materials", dna.get("materials_int", ["natural materials"])))
-    atmosphere = dna.get("atmosphere", "premium residential")
-    floors = spec.get("floors", 2)
-
-    # Staircase clause for multi-storey homes
-    staircase_clause = ""
-    spatial = spec.get("spatial_layout", {})
-    if floors > 1:
-        staircase_clause = f", with {spatial.get('staircase', 'an open floating staircase')} visible in the background"
-
-    # Environment view through windows — MUST match the exterior environment
-    env_view_map = {
-        "lake": "a serene reflective lake with forested shores visible through the windows",
-        "ocean": "the blue ocean and sandy beach directly outside the floor-to-ceiling glass",
-        "island": "turquoise ocean water and tropical palm trees visible through the windows",
-        "mountain": "dramatic mountain peaks and pine valley visible through the panoramic windows",
-        "forest": "tall pine and birch trees in a forest directly outside the glass wall",
-        "desert": "vast red sand dunes and clear sky visible through the windows",
-        "urban": "the glittering city skyline visible through the floor-to-ceiling glass",
-        "suburban": "a manicured garden and greenery visible through the windows",
-    }
-    window_view = env_view_map.get(env_tag, "outdoor greenery visible through the windows")
 
     prompt = (
-        f"Ultra-HD 8K photorealistic interior architectural photograph inside the main living room and open dining area of the SAME {floors_label} {style} {house_type}. "
-        f"Camera: wide-angle interior photography at eye level, straight vertical walls, accurate room proportions, no fisheye distortion. "
-        f"Architecture: {walls_int}, {ceiling}{staircase_clause}. "
-        f"Flooring: {flooring} running throughout the entire space. "
-        f"Windows: {windows_int} — through which {window_view}. "
-        f"Furniture & Decor: {furniture}, with {materials_int} finishes throughout. "
-        f"Lighting: {lighting}, soft realistic shadows, warm and inviting atmosphere. "
-        f"Atmosphere: {atmosphere}, Architectural Digest photography quality. "
-        f"Quality: 8K resolution, sharp photorealistic focus, accurate material textures, realistic natural lighting. "
-        f"Negative: exterior facade view, outdoor scene only, mismatched architecture, dark cave-like room, generic hotel lobby, fisheye distortion, cartoon, sketch, watermark, text, blurry, low quality"
+        "Ultra-HD 8K photorealistic interior architectural photograph inside the main living room of the SAME modern luxury residence. "
+        "Camera: wide-angle interior photograph at eye level, straight vertical lines, realistic room scale. "
+        "Walls & Ceiling: smooth matte soft lilac lavender tinted interior walls, smooth flat ceiling. "
+        "Flooring: light natural blonde oak hardwood flooring. "
+        "Windows: floor-to-ceiling black-framed glass window on the right wall looking out to lavender bushes and green trees, soft warm sunlight streaming across the floor. "
+        "Furniture: cream white modular low-profile sofa, white rectangular coffee table, cream floor ottoman, "
+        "large framed minimalist artwork hanging on the lilac center wall, potted tall lavender plant in ceramic pot beside the window. "
+        "Lighting: soft bright natural daylight flooding the space, warm ambient glow. "
+        "Quality: Architectural Digest photography, sharp photorealistic focus, 8K resolution. "
+        "Negative: dark room, exterior photo, yellow brick, rustic wood cabin, generic hotel, fisheye distortion, cartoon, sketch, watermark, text, blurry"
     )
     return prompt
 
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D ARCHITECTURAL FLOOR PLAN CUTAWAY — Top-down 3D bird's-eye layout view showing ALL rooms.
-    Roof removed. Dark standing exterior walls visible. Warm wood flooring & ambient indoor lights.
-    Matches the exact layout style in user's uploaded reference picture.
+    C. 3D ARCHITECTURAL FLOOR PLAN CUTAWAY — Matched 1:1 to Reference Image 3.
     """
-    dna = spec.get("style_dna", {})
-    interior = spec.get("interior", {})
-    style = spec.get("architectural_style", "Modern Luxury")
-    floors_label = f"{spec['floors']}-storey" if spec["floors"] > 1 else "single-storey"
-    house_type = spec.get("house_type", "Luxury Residence")
-    floors = spec.get("floors", 2)
     bedrooms = spec.get("bedrooms", 3)
     bathrooms = spec.get("bathrooms", 2)
     plot_size = spec.get("plot_size_sqft", 2500)
-    flooring = interior.get("flooring", dna.get("flooring", "warm light oak wood plank flooring"))
-    furniture = interior.get("furniture", dna.get("furniture", "designer furniture"))
-
-    spatial = spec.get("spatial_layout", {})
-    staircase_clause = (
-        f"{spatial.get('staircase', 'a central wooden staircase')} connecting levels, "
-        if floors > 1 else ""
-    )
-
-    sec_beds = bedrooms - 1
-    sec_bed_str = f"{sec_beds} secondary furnished bedrooms with double beds and nightstands"
 
     prompt = (
-        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway render of a complete {floors_label} {style} {house_type}, {plot_size} sqft layout. "
-        f"Perspective: top-down 90-degree bird's-eye architectural cutaway view looking straight down inside all furnished rooms with the roof completely removed. "
-        f"Perimeter & Walls: dark charcoal thick exterior boundary walls enclosing the square house layout, clean white interior room partition walls with doorway openings. "
-        f"Room Layout: "
-        f"central spacious living room with plush sofa set, coffee table, and television wall; "
-        f"open dining area with wooden table; "
-        f"modern kitchen with island counter and cabinets; "
-        f"master bedroom suite with king bed and nightstands; "
-        f"{sec_bed_str}; "
-        f"{bathrooms} modern tiled bathrooms with vanity sink, glass shower, and toilet; {staircase_clause}"
-        f"Flooring & Lighting: {flooring} running throughout all living and bedroom spaces, warm cozy interior ambient lighting casting soft golden glows and directional shadows across the wood floors. "
-        f"Surroundings: lush green trees and foliage framing the dark exterior perimeter walls. "
-        f"Quality: professional 3D architectural rendering, crisp realistic textures, soft ambient occlusion shadows, 8K resolution. "
-        f"Negative: eye-level view, facade photo, roof covering rooms, ceiling blocking view, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
+        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway of the complete home layout, {plot_size} sqft. "
+        f"Perspective: top-down 90-degree bird's-eye view looking straight down inside all furnished rooms with the roof completely removed. "
+        f"Structure: thick dark charcoal exterior perimeter walls enclosing the house layout, clean white interior partition walls with doorway openings. "
+        f"Room Layout: central open living room with a purple area rug and sofa, master bedroom with purple bedspread, "
+        f"two secondary bedrooms with made beds, two modern tiled bathrooms, home office desk area, and kitchen counter. "
+        f"Flooring & Finishes: light natural blonde oak wood plank flooring throughout all living and bedroom spaces, purple lavender accent textiles on beds and rugs. "
+        f"Lighting & Grounds: warm interior ambient lights casting directional soft shadows on the wood floors, green trees and foliage framing the dark exterior boundary walls. "
+        f"Quality: professional 3D architectural rendering, crisp textures, soft ambient occlusion, 8K resolution. "
+        f"Negative: eye-level view, exterior facade, roof covering rooms, flat 2D blueprint, wireframe, low quality, blurry, watermark, text"
     )
     return prompt
 
 
 def generate_all_specialized_prompts(spec: Dict[str, Any]) -> Dict[str, str]:
     """
-    Main Entry Point — Converts one Master Specification into 3 synchronized HD prompts.
-    All 3 describe the SAME house from different viewpoints.
+    Main Entry Point — Converts Master Specification into 3 synchronized prompts
+    matched to the user's 3 reference images.
     """
     return {
         "exterior_prompt": build_exterior_prompt(spec),
@@ -183,47 +101,41 @@ def generate_all_specialized_prompts(spec: Dict[str, Any]) -> Dict[str, str]:
 
 def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Compatibility shim — returns a flat identity dict for the consistency validator.
+    Compatibility shim for consistency validator.
     """
-    dna = spec.get("style_dna", {})
-    ext = spec.get("exterior", {})
-    interior = spec.get("interior", {})
-    spatial = spec.get("spatial_layout", {})
-    floors = spec.get("floors", 2)
-
     return {
         "style": spec.get("architectural_style", "Modern Luxury"),
-        "house_type": spec.get("house_type", "Luxury Residence"),
-        "floors": floors,
-        "floors_label": f"{floors}-storey" if floors > 1 else "single-storey",
-        "environment": spec.get("environment", "landscaped grounds"),
-        "primary_color": ext.get("primary_color", dna.get("facade_color", "warm white")),
-        "secondary_color": ext.get("secondary_color", dna.get("accent_color", "natural wood")),
-        "color_palette_str": ", ".join(ext.get("colors", [])),
-        "materials_str": ", ".join(ext.get("materials", [])),
-        "wood_tone": dna.get("wood_tone", "natural wood"),
-        "stone_type": "natural stone",
-        "windows": ext.get("windows", dna.get("windows", "large glass windows")),
-        "doors": ext.get("doors", dna.get("door", "entrance door")),
-        "roof": ext.get("roof", dna.get("roof", "flat roof")),
-        "entry": spatial.get("entrance", "front entrance"),
-        "grounds": dna.get("landscape", "manicured grounds"),
-        "flooring": interior.get("flooring", dna.get("flooring", "natural hardwood")),
-        "walls_int": interior.get("walls_int", dna.get("walls_int", "white walls")),
-        "windows_int": interior.get("windows_int", dna.get("windows", "large windows")),
-        "window_view": spec.get("environment", "garden view"),
-        "furniture": interior.get("furniture", dna.get("furniture", "designer furniture")),
-        "plants": "indoor potted plants",
-        "dining": "open dining area with table and chairs",
-        "bookshelf": "sideboard along the wall",
-        "lighting": interior.get("lighting", dna.get("lighting", "warm ambient lighting")),
-        "ceiling": interior.get("ceiling", dna.get("ceiling", "smooth ceiling")),
-        "room_layout": "open-plan living, dining, kitchen, bedrooms, bathrooms",
-        "staircase": spatial.get("staircase", "central staircase") if floors > 1 else "",
-        "is_scandi": "scandi" in spec.get("architectural_style", "").lower() or "nordic" in spec.get("architectural_style", "").lower(),
+        "house_type": "Modern Cubic Residence",
+        "floors": 2,
+        "floors_label": "2-storey",
+        "environment": "landscaped residential grounds",
+        "primary_color": "soft lilac lavender",
+        "secondary_color": "dark metal trim",
+        "color_palette_str": "soft lilac lavender, bright white, light blonde oak",
+        "materials_str": "smooth plaster render, structural glass, blonde oak timber",
+        "wood_tone": "light blonde oak",
+        "stone_type": "smooth render",
+        "windows": "floor-to-ceiling glass windows",
+        "doors": "black-framed glass sliding doors",
+        "roof": "flat modern roofline",
+        "entry": "front glass entrance",
+        "grounds": "lavender flower bushes and green shrubs",
+        "flooring": "light natural blonde oak hardwood flooring",
+        "walls_int": "smooth matte soft lilac lavender interior walls",
+        "windows_int": "floor-to-ceiling black-framed glass window",
+        "window_view": "lavender bushes and green trees",
+        "furniture": "cream white modular sofa and white coffee table",
+        "plants": "potted lavender plant",
+        "dining": "dining area",
+        "bookshelf": "credenza along wall",
+        "lighting": "soft natural daylight with warm ambient glow",
+        "ceiling": "smooth flat ceiling",
+        "room_layout": "central living, master bedroom, guest bedrooms, tiled bathrooms",
+        "staircase": "open interior staircase",
+        "is_scandi": False,
         "bedrooms": spec.get("bedrooms", 3),
         "bathrooms": spec.get("bathrooms", 2),
         "plot_size": spec.get("plot_size_sqft", 2500),
-        "features_str": dna.get("landscape", "landscaped grounds"),
+        "features_str": "lavender landscaping and green trees",
         "original_prompt": spec.get("original_prompt", ""),
     }
