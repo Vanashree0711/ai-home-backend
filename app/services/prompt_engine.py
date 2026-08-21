@@ -1,7 +1,7 @@
 """
-Intelligent Prompt Engine — Exact 1:1 Reference Archetype v4
-============================================================
-Derives Exterior, Interior, and 3D Layout 100% matched to the user's uploaded reference image (media_1787337986379.png):
+Intelligent Prompt Engine — Exact 1:1 Reference Archetype v4 (Ultra-HD 8K Render Enhanced)
+==========================================================================================
+Derives Exterior, Interior, and 3D Layout 100% matched to the user's uploaded reference image:
 
 1. EXTERIOR: Two-storey modern cubic luxury residence with soft lilac/lavender smooth render walls,
    black-framed floor-to-ceiling glass wall on ground floor, upper glass balcony terrace, and lavender flower bushes.
@@ -9,7 +9,7 @@ Derives Exterior, Interior, and 3D Layout 100% matched to the user's uploaded re
 2. INTERIOR: Living room inside the SAME house with soft lilac/lavender walls, light blonde oak wide-plank wood flooring,
    cream white modular sofa, white coffee table, framed wall art, and floor-to-ceiling glass window showing lavender bushes.
 
-3. 3D LAYOUT (EXACT REFERENCE REPRODUCTION):
+3. 3D LAYOUT (ENHANCED ULTRA-HD 8K ARCHITECTURAL CUTAWAY):
    - 90-degree straight top-down overhead architectural cutaway of the ENTIRE square floor plan with NO roof.
    - Thick solid black outer boundary walls framing the square layout on all 4 sides.
    - Vertical blonde wood plank flooring running continuously across all living and bedroom areas.
@@ -18,6 +18,7 @@ Derives Exterior, Interior, and 3D Layout 100% matched to the user's uploaded re
    - Tiled bathrooms with glass showers in top-right corner.
    - Warm golden sunlight streaming diagonally across the wood floor from top-right.
    - Dense green tree foliage bordering the black exterior walls on left, right, and top edges.
+   - Octane Render & V-Ray 8K ray-traced ambient occlusion and photorealistic material textures.
 """
 
 from typing import Dict, Any
@@ -64,25 +65,25 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. PHOTOREALISTIC 3D LAYOUT — Exact reproduction of reference image media_1787337986379.png.
+    C. PHOTOREALISTIC 3D LAYOUT — Enhanced Ultra-HD 8K Octane & V-Ray Render Quality.
     """
     plot_size = spec.get("plot_size_sqft", 2500)
 
     prompt = (
-        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway of the ENTIRE square house layout, {plot_size} sqft, exact 1:1 match to reference render. "
-        f"Perspective: 90-degree straight top-down overhead bird's-eye architectural view looking directly down inside the entire square floor plan with roof completely removed. "
-        f"Outer Boundary & Perimeter: thick solid black exterior boundary walls enclosing the square house footprint on all four sides. "
-        f"Flooring: vertical light blonde oak wood plank flooring running continuously across all room spaces. "
+        f"Ultra-HD 8K master-level photorealistic 3D architectural floor plan cutaway render of the ENTIRE square house layout, {plot_size} sqft. "
+        f"Perspective: exact 90-degree straight top-down overhead bird's-eye architectural view looking directly down inside the entire square floor plan with roof completely removed. "
+        f"Outer Boundary & Perimeter: thick solid matte black exterior boundary walls enclosing the square house footprint on all four sides. "
+        f"Flooring: vertical light blonde oak wood plank flooring with ultra-sharp wood grain texture running continuously across all room spaces. "
         f"Specific Furnishings & Room Elements: "
         f"LEFT SIDE — two bedrooms featuring purple lavender fabric bed sheets on beds, with a white tiled bathroom between them; "
         f"CENTER — large purple floor area rug on the blonde wood floor, with central living room and wooden coffee table; "
         f"TOP CENTER — home office workstation desk with a black swivel office chair; "
         f"TOP RIGHT — tiled bathroom suite with glass walk-in shower and white sanitary fixtures; "
         f"BOTTOM CENTER — entry foyer wooden floor porch with indoor potted green plants. "
-        f"Lighting & Shadows: warm golden sunlight streaming diagonally across the wood floor from the top right, casting long directional soft shadows. "
+        f"Lighting & Rendering Standard: V-Ray 3D architectural visualization, Octane Render 8K ultra-sharp details, ray-traced ambient occlusion, warm golden sunlight streaming diagonally across the wood floor from the top right, casting realistic long directional soft shadows. "
         f"Exterior Surroundings: dense green tree foliage bordering the black exterior walls on the left, right, and top edges against a soft grey backdrop. "
-        f"Quality: professional 3D architectural rendering, crisp wood plank textures, soft ambient occlusion, 8K resolution. "
-        f"Negative: eye-level view, angled isometric perspective, exterior facade photo, roof on, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
+        f"Quality: Unreal Engine 5 archviz photorealism, crisp wood plank textures, 8K resolution. "
+        f"Negative: eye-level view, angled isometric perspective, exterior facade photo, roof on, flat 2D blueprint lines, wireframe, low quality, blurry, pixelated, watermark, text"
     )
     return prompt
 
