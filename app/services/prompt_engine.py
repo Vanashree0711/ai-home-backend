@@ -1,6 +1,6 @@
 """
-Specialized Architectural Image Prompt Engine (Stage 3 Complete)
-==============================================================
+Specialized Architectural Image Prompt Engine (Stage 3 Calibrated to Reference)
+=============================================================================
 Transforms a Master Design Specification into synchronized, specialized prompts
 for Exterior, Interior, and Photorealistic 3D Layout Visualizations.
 
@@ -54,7 +54,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     windows = ext.get("windows", "large black-framed floor-to-ceiling glass windows")
     roof = ext.get("roof", "flat contemporary roof")
     doors = ext.get("doors", "grand pivot wooden entrance door")
-    flooring = interior.get("flooring", "large-format polished Italian marble")
+    flooring = interior.get("flooring", "light natural wood plank flooring")
     lighting = interior.get("lighting", "warm indirect 3000K architectural LED lighting")
     furniture = interior.get("furniture", f"contemporary {style} designer furniture")
 
@@ -131,7 +131,7 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
         f"Eye-level architectural photograph of the expansive main living room and open modular kitchen inside the SAME luxury {id_dna['floors_label']} {id_dna['style']} residence. "
         f"Camera: 24mm wide-angle interior architectural photography, straight vertical lines, realistic room scale and proportions. "
         f"Synchronized identity: interior walls in {id_dna['primary_color']}, custom millwork and wall paneling in {id_dna['wood_tone']}, {id_dna['stone_type']} feature accent wall. "
-        f"Finishes: {id_dna['flooring']}, {id_dna['windows']} matching exterior facade with views of the surrounding {id_dna['environment']} and pool, {id_dna['lighting']}. "
+        f"Finishes: light natural hardwood and marble flooring, {id_dna['windows']} matching exterior facade with views of the surrounding {id_dna['environment']} and pool, {id_dna['lighting']}. "
         f"Furnishing: {id_dna['furniture']}, matching neutral and {id_dna['secondary_color']} accents. "
         f"Visual standard: high resolution, HD, luxurious, clean, realistic, architecturally believable, soft ambient natural daylight, 8k resolution, Architectural Digest photography. "
         f"Negative: cartoon, sketch, mismatched architectural style, rustic wooden cabin, generic hotel lobby, distorted furniture, fisheye distortion, low quality, blurry, text, watermark"
@@ -142,22 +142,27 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
     3. PHOTOREALISTIC 3D LAYOUT:
-    Photorealistic top-down isometric cutaway 3D architectural house visualization with roof removed.
-    Shows fully furnished interior rooms, realistic materials, and surrounding landscape.
+    Straight 90-degree overhead bird's-eye architectural 3D floor plan visualization with roof removed.
+    Matches the exact benchmark format: dark thick boundary walls, light natural wood plank flooring,
+    furnished bedrooms, tiled bathrooms with glass showers, living room, dining, warm directional sunlight rays,
+    and surrounding green trees around the perimeter.
     """
     id_dna = synthesize_design_identity(spec)
 
-    rooms_breakdown = f"{id_dna['bedrooms']} bedrooms with beds, {id_dna['bathrooms']} bathrooms with tubs and showers, spacious living room with sofa set, modular kitchen with marble island and dining table, hallways and wooden doors"
-    if id_dna['has_courtyard']: rooms_breakdown += ", central open courtyard"
-    if id_dna['has_balcony']: rooms_breakdown += ", upper terrace balcony"
+    rooms_breakdown = (
+        f"furnished {id_dna['bedrooms']} bedrooms with beds and side tables, "
+        f"{id_dna['bathrooms']} modern bathrooms with glass walk-in showers and ceramic vanities, "
+        f"spacious living room area with comfortable sofa set, open dining space, and wooden interior doors"
+    )
 
     prompt = (
-        f"Stunning photorealistic 3D architectural cutaway floor plan visualization of the SAME luxury {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
-        f"Perspective: elevated top-down isometric cutaway view with roof removed to clearly display the complete fully furnished interior layout from above: {rooms_breakdown}. "
-        f"Materials & Palette: exterior walls in {id_dna['primary_color']}, {id_dna['wood_tone']} interior doors and cabinetry, {id_dna['stone_type']} accents, {id_dna['flooring']}. "
-        f"Furnishing: fully furnished with luxury beds, modern sofa, dining table, kitchen island, bathroom fixtures, indoor potted plants, and surrounding {id_dna['features_str']} situated on {id_dna['environment']}. "
-        f"Visual standard: photorealistic 3D diorama cutaway rendering, realistic materials, warm ambient lighting, realistic soft shadows, high detail, HD resolution, Architectural Digest 3D presentation. "
-        f"Negative: blank white model, grey CAD render, technical wireframe, simple floor plan, eye-level perspective room view, ceiling present, single empty room, monochromatic, blurry geometry, low resolution, text, watermark"
+        f"Stunning photorealistic 3D architectural floor plan layout of the SAME {id_dna['floors_label']} {id_dna['style']} house, {id_dna['plot_size']} sqft. "
+        f"Perspective: 90-degree straight overhead bird's-eye top-down view with entire roof sliced away to reveal the full interior room layout. "
+        f"Walls & Flooring: thick solid dark charcoal boundary walls, light natural wood plank flooring throughout all rooms. "
+        f"Furnished layout: {rooms_breakdown}, indoor potted green plants. "
+        f"Lighting & Environment: warm directional sunlight casting soft realistic shadows across the wooden floorboards, lush green trees and foliage surrounding the exterior perimeter walls. "
+        f"Visual standard: ultra-detailed 3D architectural rendering, high resolution, HD quality, realistic materials, photorealistic interior layout presentation. "
+        f"Negative: ceiling on, eye-level perspective, blank white model, grey CAD wireframe, low detail, blurry, distorted walls, text, watermark"
     )
     return prompt
 
