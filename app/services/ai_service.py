@@ -62,10 +62,10 @@ class AIEngineService:
         safe_interior = urllib.parse.quote(specialized_prompts["interior_prompt"])
         safe_floorplan = urllib.parse.quote(specialized_prompts["floorplan_prompt"])
 
-        # Ultra-HD 2K high-resolution rendering pipeline
-        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1920&height=1080&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1920&height=1080&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1536&height=1536&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        # Ultra-HD 2K high-resolution rendering pipeline (enhance=false locks prompt character-for-character)
+        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1920&height=1080&nologo=true&seed={master_seed}&model=flux&enhance=false"
+        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1920&height=1080&nologo=true&seed={master_seed}&model=flux&enhance=false"
+        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1536&height=1536&nologo=true&seed={master_seed}&model=flux&enhance=false"
 
         return {
             "exterior_url": ext_url,
@@ -84,13 +84,13 @@ class AIEngineService:
 
         if image_type == "exterior":
             prompt = build_exterior_prompt(spec)
-            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1920&height=1080&nologo=true&seed={seed}&model=flux&enhance=true"
+            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1920&height=1080&nologo=true&seed={seed}&model=flux&enhance=false"
         elif image_type == "interior":
             prompt = build_interior_prompt(spec)
-            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1920&height=1080&nologo=true&seed={seed}&model=flux&enhance=true"
+            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1920&height=1080&nologo=true&seed={seed}&model=flux&enhance=false"
         else:  # "3d"
             prompt = build_3d_prompt(spec)
-            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1536&height=1536&nologo=true&seed={seed}&model=flux&enhance=true"
+            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1536&height=1536&nologo=true&seed={seed}&model=flux&enhance=false"
 
         return {"url": url, "seed": seed, "prompt": prompt}
 
