@@ -13,10 +13,10 @@ class AIEngineService:
 
     @staticmethod
     async def generate_images(prompt: str, style: str, budget: int = 150000, plot_size: int = 2500):
-        # 1. Master Design Specification (Single Source of Truth - Stage 1)
+        # 1. Master Design Specification (Single Source of Truth)
         spec = parse_master_design_specification(prompt, style, budget, plot_size)
 
-        # 2. Specialized Image Prompt Engine (Stage 2)
+        # 2. Specialized Image Prompt Engine (Master Blueprint Driven)
         specialized_prompts = generate_all_specialized_prompts(spec)
 
         # 3. Master Seed for color, material & atmospheric synchronization
@@ -26,10 +26,10 @@ class AIEngineService:
         safe_interior = urllib.parse.quote(specialized_prompts["interior_prompt"])
         safe_floorplan = urllib.parse.quote(specialized_prompts["floorplan_prompt"])
 
-        # Unified parameters across all three image pipelines
-        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
-        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1024&height=1024&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        # Ultra-HD 2K high-resolution rendering pipeline
+        ext_url = f"https://image.pollinations.ai/prompt/{safe_exterior}?width=1920&height=1080&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        int_url = f"https://image.pollinations.ai/prompt/{safe_interior}?width=1920&height=1080&nologo=true&seed={master_seed}&model=flux&enhance=true"
+        fp_url  = f"https://image.pollinations.ai/prompt/{safe_floorplan}?width=1536&height=1536&nologo=true&seed={master_seed}&model=flux&enhance=true"
 
         return {
             "exterior_url": ext_url,
@@ -47,12 +47,14 @@ class AIEngineService:
 
         if image_type == "exterior":
             prompt = build_exterior_prompt(spec)
+            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1920&height=1080&nologo=true&seed={seed}&model=flux&enhance=true"
         elif image_type == "interior":
             prompt = build_interior_prompt(spec)
+            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1920&height=1080&nologo=true&seed={seed}&model=flux&enhance=true"
         else:  # "3d"
             prompt = build_3d_prompt(spec)
+            url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1536&height=1536&nologo=true&seed={seed}&model=flux&enhance=true"
 
-        url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?width=1024&height=1024&nologo=true&seed={seed}&model=flux&enhance=true"
         return {"url": url, "seed": seed, "prompt": prompt}
 
     @staticmethod
