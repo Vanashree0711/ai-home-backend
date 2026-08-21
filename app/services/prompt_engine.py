@@ -22,6 +22,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     style = spec.get("architectural_style") or house.get("architectural_style", "Modern Luxury")
     floors = spec.get("floors") or house.get("floors", 2)
     house_type = spec.get("house_type") or house.get("house_type", "Luxury Residence")
+    environment = spec.get("environment") or ext.get("environment", "landscaped residential grounds")
 
     # Colors
     ext_colors = ext.get("colors", ["warm white", "natural wood"])
@@ -72,6 +73,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
         "house_type": house_type,
         "floors": floors,
         "floors_label": f"{floors}-storey" if floors > 1 else "single-storey",
+        "environment": environment,
         "primary_color": primary_color,
         "secondary_color": secondary_color,
         "color_palette_str": color_palette_str,
@@ -107,10 +109,10 @@ def build_exterior_prompt(spec: Dict[str, Any]) -> str:
     id_dna = synthesize_design_identity(spec)
 
     prompt = (
-        f"Wide-angle architectural photograph of a luxury {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
+        f"Wide-angle architectural photograph of a luxury {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft, situated on {id_dna['environment']}. "
         f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green manicured lawn in foreground, open sky above, never cropped, no close-ups. "
         f"Facade: finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}, {id_dna['windows']}, clearly visible entrance with {id_dna['doors']}, {id_dna['roof']}. "
-        f"Grounds: {id_dna['features_str']}. "
+        f"Grounds: {id_dna['features_str']}, situated on {id_dna['environment']}. "
         f"Visual standard: high resolution, HD, luxury real-estate photography, natural bright daytime sunlight, crisp reflections, realistic shadows, 8k resolution. "
         f"Negative: close-up, cropped house, tight shot, cut off edges, cartoon, sketch, painting, fantasy building, distorted architecture, extra floors, blurry, text, watermark"
     )
@@ -129,7 +131,7 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
         f"Eye-level architectural photograph of the expansive main living room and open modular kitchen inside the SAME luxury {id_dna['floors_label']} {id_dna['style']} residence. "
         f"Camera: 24mm wide-angle interior architectural photography, straight vertical lines, realistic room scale and proportions. "
         f"Synchronized identity: interior walls in {id_dna['primary_color']}, custom millwork and wall paneling in {id_dna['wood_tone']}, {id_dna['stone_type']} feature accent wall. "
-        f"Finishes: {id_dna['flooring']}, {id_dna['windows']} matching exterior facade with views of the garden and pool, {id_dna['lighting']}. "
+        f"Finishes: {id_dna['flooring']}, {id_dna['windows']} matching exterior facade with views of the surrounding {id_dna['environment']} and pool, {id_dna['lighting']}. "
         f"Furnishing: {id_dna['furniture']}, matching neutral and {id_dna['secondary_color']} accents. "
         f"Visual standard: high resolution, HD, luxurious, clean, realistic, architecturally believable, soft ambient natural daylight, 8k resolution, Architectural Digest photography. "
         f"Negative: cartoon, sketch, mismatched architectural style, rustic wooden cabin, generic hotel lobby, distorted furniture, fisheye distortion, low quality, blurry, text, watermark"
@@ -153,7 +155,7 @@ def build_3d_prompt(spec: Dict[str, Any]) -> str:
         f"Stunning photorealistic 3D architectural cutaway floor plan visualization of the SAME luxury {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
         f"Perspective: elevated top-down isometric cutaway view with roof removed to clearly display the complete fully furnished interior layout from above: {rooms_breakdown}. "
         f"Materials & Palette: exterior walls in {id_dna['primary_color']}, {id_dna['wood_tone']} interior doors and cabinetry, {id_dna['stone_type']} accents, {id_dna['flooring']}. "
-        f"Furnishing: fully furnished with luxury beds, modern sofa, dining table, kitchen island, bathroom fixtures, indoor potted plants, and surrounding outdoor {id_dna['features_str']}. "
+        f"Furnishing: fully furnished with luxury beds, modern sofa, dining table, kitchen island, bathroom fixtures, indoor potted plants, and surrounding {id_dna['features_str']} situated on {id_dna['environment']}. "
         f"Visual standard: photorealistic 3D diorama cutaway rendering, realistic materials, warm ambient lighting, realistic soft shadows, high detail, HD resolution, Architectural Digest 3D presentation. "
         f"Negative: blank white model, grey CAD render, technical wireframe, simple floor plan, eye-level perspective room view, ceiling present, single empty room, monochromatic, blurry geometry, low resolution, text, watermark"
     )

@@ -111,8 +111,21 @@ def parse_master_design_specification(
                 break
 
     # --------------------------------------------------------------------------
-    # 4. EXTERIOR ATTRIBUTES (Colors, Materials, Windows, Roof, Features)
+    # 4. EXTERIOR ATTRIBUTES & ENVIRONMENT SETTING
     # --------------------------------------------------------------------------
+    # Environmental Geography (Island, Lake, Ocean, Mountain, Forest)
+    environment = "landscaped residential grounds"
+    if any(kw in p for kw in ["island", "private island", "on an island", "tropical island", "around island"]):
+        environment = "private tropical island surrounded by turquoise ocean water and sandy shores"
+    elif any(kw in p for kw in ["lake", "lakeside", "lakefront", "near lake", "on lake", "on the lake"]):
+        environment = "calm blue lakefront shoreline with serene reflective water"
+    elif any(kw in p for kw in ["beach", "ocean", "sea", "coastal", "seaside", "waterfront"]):
+        environment = "coastal oceanfront beach with sandy shore"
+    elif any(kw in p for kw in ["mountain", "cliff", "hillside"]):
+        environment = "scenic mountain hillside with panoramic natural views"
+    elif any(kw in p for kw in ["forest", "pine", "woodland"]):
+        environment = "serene forest clearing surrounded by tall evergreen trees"
+
     exterior_colors: List[str] = []
     color_map = {
         "white": "warm white", "off-white": "off-white", "cream": "cream",
@@ -246,6 +259,8 @@ def parse_master_design_specification(
     if has_balcony: special_requirements.append("Balcony / Terrace Deck")
     if "no pool" in p: special_requirements.append("Strictly No Swimming Pool")
     if "budget" in p: special_requirements.append("Cost-Optimized Design")
+    if "island" in p: special_requirements.append("Island / Waterfront Location")
+    if "lake" in p: special_requirements.append("Lakefront Location")
 
     # --------------------------------------------------------------------------
     # 7. ASSEMBLE MASTER DESIGN SPECIFICATION SCHEMA
@@ -258,6 +273,7 @@ def parse_master_design_specification(
         "bathrooms": bathrooms,
         "plot_size_sqft": plot_size,
         "budget_usd": budget,
+        "environment": environment,
         "exterior": {
             "primary_color": primary_color,
             "secondary_color": secondary_color,
@@ -266,6 +282,7 @@ def parse_master_design_specification(
             "windows": windows,
             "doors": doors,
             "roof": roof,
+            "environment": environment,
             "balcony": has_balcony,
             "pool": has_pool,
             "garden": has_garden,
@@ -288,7 +305,8 @@ def parse_master_design_specification(
             "floors": floors,
             "house_type": house_type,
             "plot_size_sqft": plot_size,
-            "budget_usd": budget
+            "budget_usd": budget,
+            "environment": environment
         },
         "rooms": rooms,
         "special_requirements": special_requirements,
