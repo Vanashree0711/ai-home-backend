@@ -197,6 +197,8 @@ def parse_master_design_specification(
         flooring = "traditional polished red oxide flooring"
     elif "marble" in p:
         flooring = "large-format polished Italian marble"
+    elif "grey flooring" in p or "gray flooring" in p:
+        flooring = "modern grey porcelain and stone flooring"
     elif "hardwood" in p or "wood floor" in p or "oak floor" in p:
         flooring = "wide-plank natural hardwood flooring"
     elif "concrete" in p:

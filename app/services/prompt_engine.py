@@ -18,6 +18,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     ext = spec.get("exterior", {})
     interior = spec.get("interior", {})
     house = spec.get("house", {})
+    p = spec.get("original_prompt", "").lower()
 
     style = spec.get("architectural_style") or house.get("architectural_style", "Minimalist Scandinavian")
     floors = spec.get("floors") or house.get("floors", 2)
@@ -34,39 +35,37 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     materials = ext.get("materials", ["smooth off-white plaster render", "blonde oak timber", "clear glass"])
     materials_str = ", ".join(materials)
 
-    is_scandi = "scandinavian" in style.lower() or "nordic" in style.lower() or "minimalist" in style.lower()
-
-    if is_scandi:
+    # Wood Tone parsing
+    if "dark wood" in p or "dark wooden" in p or "dark espresso" in p:
+        wood_tone = "dark espresso stained wood accents"
+    elif "walnut" in p:
+        wood_tone = "natural walnut wood accents"
+    elif "teak" in p:
+        wood_tone = "handcrafted teak wood"
+    elif "cedar" in p:
+        wood_tone = "rich cedar timber"
+    elif "oak" in p or "blonde" in p:
         wood_tone = "blonde natural light oak timber"
-        stone_type = "smooth limestone and plaster accents"
-        flooring = "light blonde oak herringbone hardwood flooring"
-        lighting = "soft diffused Nordic daylight, sculptural woven pendant lamp, and warm ambient floor lamps"
-        furniture = "tailored Scandinavian linen sofa, round light oak nested coffee tables, and curved wooden chairs"
-        doors = "blonde light oak natural wood pivot door"
-        windows = "minimalist black-framed floor-to-ceiling glass sliding doors and recessed windows"
     else:
-        wood_tone = "natural walnut timber"
-        for mat in materials + ext_colors:
-            if "oak" in mat: wood_tone = "natural light oak timber"
-            elif "teak" in mat: wood_tone = "handcrafted teak wood"
-            elif "cedar" in mat: wood_tone = "rich cedar timber"
-            elif "walnut" in mat: wood_tone = "natural walnut wood accents"
+        wood_tone = "natural warm wood accents"
 
-        stone_type = "natural stone cladding"
-        for mat in materials:
-            if "brick" in mat: stone_type = "exposed brickwork"
-            elif "slate" in mat: stone_type = "dark grey slate stone"
-            elif "travertine" in mat: stone_type = "warm travertine stone"
-            elif "granite" in mat: stone_type = "dark charcoal stone"
-            elif "marble" in mat: stone_type = "polished marble"
-            elif "grey" in mat or "gray" in mat or "dark" in mat: stone_type = "dark grey natural stone"
+    # Stone Type parsing
+    stone_type = "natural stone cladding"
+    for mat in materials:
+        if "brick" in mat: stone_type = "exposed brickwork"
+        elif "slate" in mat: stone_type = "dark grey slate stone"
+        elif "travertine" in mat: stone_type = "warm travertine stone"
+        elif "granite" in mat: stone_type = "dark charcoal stone"
+        elif "marble" in mat: stone_type = "polished marble"
+        elif "grey" in mat or "gray" in mat or "dark" in mat: stone_type = "dark grey natural stone"
 
-        windows = ext.get("windows", "large black-framed floor-to-ceiling glass windows")
-        doors = ext.get("doors", "grand pivot wooden entrance door")
-        flooring = interior.get("flooring", "large-format polished Italian marble and hardwood")
-        lighting = interior.get("lighting", "warm indirect 3000K architectural LED lighting")
-        furniture = interior.get("furniture", f"contemporary {style} designer furniture")
+    is_scandi = "scandinavian" in style.lower() or "nordic" in style.lower()
 
+    windows = ext.get("windows", "large black-framed floor-to-ceiling glass windows")
+    doors = ext.get("doors", "grand pivot wooden entrance door")
+    flooring = interior.get("flooring") or ("light blonde oak herringbone hardwood flooring" if is_scandi else "large-format polished Italian marble and hardwood")
+    lighting = interior.get("lighting") or ("soft diffused Nordic daylight, sculptural woven pendant lamp, and warm ambient floor lamps" if is_scandi else "warm indirect 3000K architectural LED lighting")
+    furniture = interior.get("furniture") or (f"contemporary {style} designer furniture")
     roof = ext.get("roof", "flat contemporary roof")
 
     # Landscape & Features
@@ -122,8 +121,8 @@ def build_exterior_prompt(spec: Dict[str, Any]) -> str:
 
     prompt = (
         f"Wide-angle architectural photograph of a {id_dna['floors_label']} {id_dna['style']} {id_dna['house_type']}, {id_dna['plot_size']} sqft. "
-        f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green lawn and gravel pathway in foreground, open sky above, never cropped, no close-ups. "
-        f"Facade: clean geometric cubic volumes finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}, {id_dna['windows']}, clearly visible entrance with {id_dna['doors']}, {id_dna['roof']}. "
+        f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green lawn and pathway in foreground, open sky above, never cropped, no close-ups. "
+        f"Facade: clean geometric architecture finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}, {id_dna['windows']}, clearly visible entrance with {id_dna['doors']}, {id_dna['roof']}. "
         f"Grounds: {id_dna['features_str']}, situated on {id_dna['environment']}. "
         f"Visual standard: high resolution, HD, luxury real-estate photography, natural bright daytime sunlight, crisp reflections, realistic shadows, 8k resolution. "
         f"Negative: close-up, cropped house, tight shot, cut off edges, cartoon, sketch, painting, fantasy building, distorted architecture, extra floors, blurry, text, watermark"
@@ -142,10 +141,10 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
     prompt = (
         f"Eye-level architectural photograph of the expansive main living room and open dining area inside the SAME {id_dna['floors_label']} {id_dna['style']} residence. "
         f"Camera: 24mm wide-angle interior architectural photography, straight vertical lines, realistic room scale and proportions. "
-        f"Synchronized identity: interior walls in {id_dna['primary_color']} and soft greige, custom {id_dna['wood_tone']} credenza and wall accents, {id_dna['stone_type']}. "
+        f"Synchronized identity: interior walls in {id_dna['primary_color']} with matching neutral tones, custom {id_dna['wood_tone']} cabinetry and wall accents, {id_dna['stone_type']}. "
         f"Finishes: {id_dna['flooring']}, {id_dna['windows']} with sheer linen curtains and views of the surrounding garden, {id_dna['lighting']}. "
-        f"Furnishing: {id_dna['furniture']}, soft textured throw pillows, cozy area rug, indoor potted fiddle leaf fig plants. "
-        f"Visual standard: high resolution, HD, luxurious Scandinavian aesthetic, clean, serene, airy, realistic, soft ambient natural daylight, 8k resolution, Architectural Digest photography. "
+        f"Furnishing: {id_dna['furniture']}, soft textured cushions, cozy area rug, indoor potted plants. "
+        f"Visual standard: high resolution, HD, luxurious architectural aesthetic, clean, serene, airy, realistic, soft ambient natural daylight, 8k resolution, Architectural Digest photography. "
         f"Negative: dark moody cave, cartoon, sketch, mismatched architecture, rustic wooden log cabin, generic hotel lobby, distorted furniture, fisheye distortion, low quality, blurry, text, watermark"
     )
     return prompt
@@ -160,18 +159,18 @@ def build_3d_prompt(spec: Dict[str, Any]) -> str:
     id_dna = synthesize_design_identity(spec)
 
     rooms_breakdown = (
-        f"master bedroom suite with king bed and side tables, {id_dna['bedrooms'] - 1} secondary bedrooms with beds, "
+        f"master bedroom suite with bed and nightstands, {id_dna['bedrooms'] - 1} secondary bedrooms with beds, "
         f"{id_dna['bathrooms']} modern bathrooms with glass showers and vanities, "
         f"large open living room with sectional sofa set and coffee table, gourmet kitchen with island counter and dining table with chairs, "
-        f"hallways, closets, and wooden interior doors"
+        f"hallways, closets, and {id_dna['doors']}"
     )
 
     prompt = (
         f"Stunning photorealistic 3D architectural floor plan visualization of the ENTIRE {id_dna['floors_label']} {id_dna['style']} home, {id_dna['plot_size']} sqft. "
         f"Perspective: full-property 90-degree straight overhead bird's-eye view showing the complete entire house layout with roof removed from wall to wall. "
-        f"Complete floor plan structure: thick solid dark charcoal boundary walls, {id_dna['flooring']} throughout all rooms, {id_dna['wood_tone']} interior doors and cabinetry. "
+        f"Complete floor plan structure: thick solid dark charcoal boundary walls, exterior walls in {id_dna['primary_color']}, {id_dna['flooring']} throughout all rooms, {id_dna['wood_tone']} interior doors and cabinetry. "
         f"Full furnished rooms: {rooms_breakdown}, indoor potted plants, and surrounding outdoor {id_dna['features_str']} around the perimeter walls. "
-        f"Lighting & Rendering: warm directional sunlight rays casting soft realistic shadows across wooden floorboards, ultra-high detail 3D architectural rendering, 8k resolution, photorealistic master house plan. "
+        f"Lighting & Rendering: warm directional sunlight rays casting soft realistic shadows across floorboards, ultra-high detail 3D architectural rendering, 8k resolution, photorealistic master house plan. "
         f"Negative: single room, cropped room, partial floor plan, ceiling on, eye-level perspective, blank white model, grey CAD wireframe, low detail, blurry, distorted walls, text, watermark"
     )
     return prompt
