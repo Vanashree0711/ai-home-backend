@@ -1,10 +1,8 @@
 """
-Specialized Architectural Image Prompt Engine (Master Blueprint Driven)
-======================================================================
+Specialized Architectural Image Prompt Engine (Master Blueprint Driven - HD Enhanced)
+=====================================================================================
 Derives Exterior, Interior, and 3D Floor Plan representations directly from
-the immutable Master House Design Specification.
-
-Calibrated to the 45-degree isometric 3D architectural cutaway diorama standard.
+the immutable Master House Design Specification with Ultra-HD 8K photographic fidelity.
 """
 
 from typing import Dict, Any, List
@@ -120,26 +118,26 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
 
 def build_exterior_prompt(spec: Dict[str, Any]) -> str:
     """
-    A. EXTERIOR VIEW:
+    A. EXTERIOR VIEW (Ultra HD 8K):
     Derived directly from Master House Specification.
     Full property wide three-quarter perspective showing the complete building.
     """
     id_dna = synthesize_design_identity(spec)
 
     prompt = (
-        f"Wide-angle architectural photograph of the exterior of a {id_dna['floors_label']} {id_dna['style']} {id_dna['house_type']}, {id_dna['plot_size']} sqft. "
+        f"Ultra-HD 8k architectural photograph of the exterior of a luxury {id_dna['floors_label']} {id_dna['style']} {id_dna['house_type']}, {id_dna['plot_size']} sqft. "
         f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green lawn and stone pathway in foreground, open sky above, never cropped, no close-ups. "
         f"Facade Architecture: clean geometric volume finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}, {id_dna['windows']}, clearly visible entrance at {id_dna['entrance']}, {id_dna['roof']}. "
         f"Site & Grounds: {id_dna['features_str']}, situated on {id_dna['environment']}. "
-        f"Visual standard: high resolution, HD, luxury real-estate photography, natural bright daytime sunlight, crisp reflections, realistic shadows, 8k resolution. "
-        f"Negative: close-up, cropped house, tight shot, cut off edges, cartoon, sketch, painting, fantasy building, distorted architecture, extra floors, blurry, text, watermark"
+        f"Quality standard: Hasselblad H6D-100c medium format, sharp crisp focus, ultra-detailed architectural textures, photorealistic global illumination, natural bright daytime sunlight, realistic reflections, 8k resolution. "
+        f"Negative: low quality, blurry, pixelated, jpeg artifacts, compression noise, close-up, cropped house, tight shot, cut off edges, cartoon, sketch, painting, fantasy building, distorted architecture, extra floors, text, watermark"
     )
     return prompt
 
 
 def build_interior_prompt(spec: Dict[str, Any]) -> str:
     """
-    B. INTERIOR VIEW:
+    B. INTERIOR VIEW (Ultra HD 8K):
     Derived directly from Master House Specification.
     Staged inside the ground floor living room & open kitchen of the Master Blueprint.
     """
@@ -148,24 +146,21 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
     staircase_clause = f", featuring {id_dna['staircase']}" if id_dna['floors'] > 1 else ""
 
     prompt = (
-        f"Eye-level architectural photograph inside the main ground floor living room and open modular kitchen of the SAME {id_dna['floors_label']} {id_dna['style']} residence. "
+        f"Ultra-HD 8k interior architectural photograph inside the main ground floor living room and open modular kitchen of the SAME {id_dna['floors_label']} {id_dna['style']} residence. "
         f"Camera: 24mm wide-angle interior architectural photography, straight vertical lines, realistic room proportions. "
         f"Spatial Architecture: interior walls in {id_dna['primary_color']} with matching neutral tones, custom {id_dna['wood_tone']} cabinetry and wall accents, {id_dna['stone_type']}{staircase_clause}. "
         f"Finishes & Ceiling: {id_dna['flooring']}, {id_dna['ceiling']}, {id_dna['windows']} with sheer linen curtains and views of the surrounding garden and pool, {id_dna['lighting']}. "
         f"Furnishing: {id_dna['furniture']}, matching area rug, indoor potted plants, kitchen island counter in background. "
-        f"Visual standard: high resolution, HD, luxurious architectural aesthetic, clean, serene, airy, realistic, soft ambient natural daylight, 8k resolution, Architectural Digest photography. "
-        f"Negative: dark moody cave, cartoon, sketch, mismatched architecture, rustic wooden log cabin, generic hotel lobby, distorted furniture, fisheye distortion, low quality, blurry, text, watermark"
+        f"Quality standard: Hasselblad H6D-100c medium format, crisp sharp details, realistic material micro-textures, soft ambient natural daylight, Architectural Digest luxury photography, 8k resolution. "
+        f"Negative: low quality, blurry, pixelated, compression artifacts, dark moody cave, cartoon, sketch, mismatched architecture, rustic wooden log cabin, generic hotel lobby, distorted furniture, fisheye distortion, text, watermark"
     )
     return prompt
 
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D FLOOR PLAN / DIORAMA:
+    C. 3D FLOOR PLAN / DIORAMA (Ultra HD 8K):
     Elevated 45-degree isometric 3D architectural cutaway diorama view with roof sliced off.
-    Matches the exact benchmark format: clean standing walls with window and door cutouts,
-    warm light wood plank flooring, fully furnished rooms, golden sunlight streaming across the floor,
-    and surrounding lush landscaped garden with stone pathways and water views.
     """
     id_dna = synthesize_design_identity(spec)
 
@@ -178,14 +173,14 @@ def build_3d_prompt(spec: Dict[str, Any]) -> str:
     )
 
     prompt = (
-        f"Stunning photorealistic 3D architectural cutaway rendering of the {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
+        f"Ultra-HD 8k photorealistic 3D architectural cutaway rendering of the {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
         f"Perspective: elevated 45-degree isometric three-quarter top-down dollhouse view with roof removed to look down into the full room layout. "
         f"Walls & Openings: clean standing {id_dna['primary_color']} walls with wall-top cutoffs, doorway openings, and exterior window cutouts looking out. "
         f"Flooring & Finishes: {id_dna['flooring']} across living and bedroom areas, light tiled bathroom floor. "
         f"Furnished layout: {rooms_breakdown}, indoor potted green plants. "
         f"Lighting & Environment: golden warm sunlight streaming diagonally across the rooms casting soft realistic shadows, surrounded by lush green lawn, stone garden pathway, flower bushes, situated on {id_dna['environment']}. "
-        f"Visual standard: high resolution, 3D architectural diorama visualization, HD quality, realistic materials, warm ambient lighting, 8k resolution. "
-        f"Negative: ceiling on, eye-level perspective, flat 2D blueprint, black and white CAD drawing, wireframe, low quality, blurry, text, watermark"
+        f"Quality standard: ultra-detailed 3D architectural diorama visualization, ray-traced ambient occlusion, crisp textures, sharp edges, 8k resolution master render. "
+        f"Negative: low quality, blurry, pixelated, jpeg artifacts, ceiling on, eye-level perspective, flat 2D blueprint, black and white CAD drawing, wireframe, text, watermark"
     )
     return prompt
 
