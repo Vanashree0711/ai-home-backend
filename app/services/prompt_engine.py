@@ -341,50 +341,56 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# C. 3D INTERIOR FLOOR PLAN / CUTAWAY
+# C. 3D ISOMETRIC DOLLHOUSE FLOOR PLAN / CUTAWAY
 # ══════════════════════════════════════════════════════════════════════════════
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D INTERIOR FLOOR PLAN CUTAWAY (Ultra HD photorealistic):
-    Top-down elevated isometric view looking inside the furnished interior rooms.
-    Roof completely removed. Shows ALL rooms simultaneously.
+    C. 3D ISOMETRIC DOLLHOUSE FLOOR PLAN (Ultra HD photorealistic):
+    45-degree elevated isometric cutaway view with standing 3D walls,
+    roof removed, all rooms furnished and labeled, warm golden wood flooring,
+    outdoor greenery surrounding the building.
+    Matches the "3D Isometric Dollhouse Floor Plan" architectural visualization style.
     """
     dna = synthesize_design_identity(spec)
 
     if dna["is_scandi"]:
         prompt = (
-            "Ultra-HD 8K photorealistic 3D architectural interior floor plan cutaway visualization of an entire single-storey Minimalist Scandinavian home. "
-            "Perspective: elevated top-down isometric view looking directly inside all furnished interior rooms simultaneously with the roof completely removed and no ceiling visible. "
-            "Interior Room Layout from front to back: "
-            "FRONT CENTER — entry porch area opening into a spacious central living room with a light grey sofa set facing a TV unit and a wooden coffee table with sheepskin rug; "
-            "CENTER — open-plan dining area with a round wooden dining table surrounded by bentwood chairs; "
-            "LEFT — open kitchen with white cabinets, marble countertops, and a central island counter; "
-            "LEFT REAR — outdoor terrace deck visible through glass sliding doors with outdoor dining table and chairs; "
-            "LEFT REAR WING — master bedroom suite with king-size bed, two nightstands, walk-in wardrobe/closet with hanging rail; "
-            "RIGHT WING — Bedroom 2 with a double bed, nightstand, and built-in wardrobe; "
-            "RIGHT WING — Bedroom 3 with a single bed and desk; "
-            "BATHROOMS — 2 modern bathrooms with glass walk-in showers, toilets, vanity sinks, and tiled walls; "
-            "LAUNDRY — small utility/laundry room on the right rear. "
-            "Interior Finishes: light natural blonde oak wide-plank hardwood flooring throughout all living, dining, and bedroom areas, "
-            "light grey ceramic tiles in bathrooms, thick clean bright white partition walls with wide doorway openings. "
-            "Plants: indoor potted green plants in the living room and corners. "
-            "Lighting: warm indoor ambient lighting with sunlight streaming across the interior from the left-side glass wall. "
-            "Quality: ultra-detailed photorealistic 3D architectural visualization, soft accurate shadows, rich material textures, 8K resolution. "
-            "Negative: exterior building facade, outside the house, roof present, ceiling blocking the view, outdoor street, sky above, 2D flat blueprint, black and white CAD drawing, wireframe, low quality, blurry, pixelated, watermark, text"
+            "Ultra-HD 8K photorealistic 3D isometric dollhouse floor plan architectural visualization of a complete single-storey Minimalist Scandinavian home. "
+            "Perspective: 45-degree elevated isometric bird's-eye angled view — NOT straight top-down, NOT eye-level — the classic dollhouse cutaway angle showing the interior rooms from above at a diagonal. "
+            "Structure: roof completely removed so all interior rooms are visible, thick 3D standing white walls with visible depth and thickness at all edges, doorway openings cut through walls, window openings with black frames in exterior walls. "
+            "Interior Room Layout with room name labels and dimension text: "
+            "FRONT PORCH — covered entrance porch at the bottom front center; "
+            "LIVING ROOM — central living room with grey sofa set, wooden coffee table, and sheepskin rug; "
+            "KITCHEN/DINING — open kitchen with white cabinets and island counter connected to dining area with round wooden table and bentwood chairs; "
+            "PRIMARY BEDROOM — master bedroom on the right rear with a king-size double bed, two nightstands, and an ensuite bathroom with glass shower; "
+            "ENSUITE — modern ensuite bathroom with glass walk-in shower, toilet, and vanity sink; "
+            "BEDROOM 2 — secondary bedroom with a double bed, nightstand, and built-in wardrobe; "
+            "BEDROOM 3 — third bedroom with a single bed and desk; "
+            "BATH — shared bathroom with bathtub/shower, toilet, and vanity sink; "
+            "LAUNDRY/MUD — laundry room with washing machine and utility shelving at the rear. "
+            "Flooring: warm golden honey-toned oak wood plank flooring with visible plank lines running throughout all living, dining, and bedroom areas. "
+            "Lighting: warm golden afternoon sunlight streaming diagonally across the interior floor from the exterior windows, casting soft realistic shadows on the furniture and floors. "
+            "Exterior surroundings: the building sits on a green grass lawn with trees and shrubs visible around the edges of the house. "
+            "Style: photorealistic 3D architectural visualization with accurate furniture scale, crisp material textures, soft shadows, and professional render quality, 8K resolution. "
+            "Negative: straight top-down 2D floor plan, eye-level interior photograph, exterior facade photograph, roof covering the rooms, ceiling blocking view, flat 2D blueprint, black and white CAD drawing, wireframe only, low quality, blurry, pixelated, watermark, text overlays"
         )
     else:
-        staircase_clause = f"{dna['staircase']}, " if dna["floors"] > 1 else ""
+        staircase_clause = f"{dna['staircase']} visible between floors, " if dna["floors"] > 1 else ""
+        floors_desc = f"all {dna['floors']} floors simultaneously shown in cross-section" if dna["floors"] > 1 else "the entire single floor"
         prompt = (
-            f"Ultra-HD 8K photorealistic 3D interior floor plan cutaway of the entire {dna['floors_label']} {dna['style']} {dna['house_type']}, {dna['plot_size']} sqft. "
-            f"Perspective: top-down elevated isometric view inside all furnished rooms, roof completely removed. "
-            f"Room Layout: {dna['room_layout']}. {staircase_clause}"
-            f"Interior Finishes: {dna['flooring']} in living and bedroom areas, tiled bathrooms, white partition walls. "
-            f"Lighting: {dna['lighting']}, sunlight illuminating the interior from above. "
-            f"Quality: ultra-detailed 3D architectural interior visualization, photorealistic materials and textures, 8K resolution. "
-            f"Negative: exterior building, roof on, ceiling blocking view, outdoor yard, sky, 2D flat blueprint, wireframe, low quality, blurry, watermark, text"
+            f"Ultra-HD 8K photorealistic 3D isometric dollhouse floor plan architectural visualization of a complete {dna['floors_label']} {dna['style']} {dna['house_type']}, {dna['plot_size']} sqft. "
+            f"Perspective: 45-degree elevated isometric angled dollhouse cutaway view — not straight top-down, not eye-level — showing {floors_desc} from an angled bird's-eye perspective. "
+            f"Structure: roof completely removed, thick 3D standing walls with visible depth and thickness, doorway and window openings clearly cut through the walls. {staircase_clause}"
+            f"Interior Layout with room labels: {dna['room_layout']}. "
+            f"Flooring: {dna['flooring']} with visible plank lines throughout all living and bedroom areas, tiled surfaces in bathrooms and kitchen. "
+            f"Lighting: warm golden sunlight streaming across the interior from exterior windows, casting soft directional shadows on furniture and floors, warm ambient indoor lighting. "
+            f"Surroundings: green garden lawn and trees visible around the exterior walls of the building. "
+            f"Quality: ultra-detailed photorealistic 3D architectural dollhouse visualization, accurate furniture scale, crisp material textures, 8K resolution. "
+            f"Negative: straight top-down 2D floor plan, eye-level interior photograph, exterior facade photo, roof on, ceiling blocking rooms, flat 2D blueprint, wireframe, low quality, blurry, watermark, text"
         )
 
     return prompt
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
