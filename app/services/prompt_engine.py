@@ -10,7 +10,7 @@ Pipeline:
 Guarantees:
   - All 3 prompts share identical architecture, colors, materials, floors, and style
   - Environment (lake, ocean, mountain) appears in Exterior and Interior view
-  - 3D Floor Plan shows all furnished rooms from 45° isometric dollhouse view
+  - 3D Floor Plan shows all furnished rooms from top-down architectural cutaway view matching the user reference
   - Style DNA drives every material, color, and atmosphere decision
 """
 
@@ -125,9 +125,9 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D ISOMETRIC DOLLHOUSE FLOOR PLAN — 45-degree angled cutaway view showing ALL rooms.
-    Roof removed. Standing 3D walls visible. All rooms furnished simultaneously.
-    Must match the same house layout as the Exterior and Interior views.
+    C. 3D ARCHITECTURAL FLOOR PLAN CUTAWAY — Top-down 3D bird's-eye layout view showing ALL rooms.
+    Roof removed. Dark standing exterior walls visible. Warm wood flooring & ambient indoor lights.
+    Matches the exact layout style in user's uploaded reference picture.
     """
     dna = spec.get("style_dna", {})
     interior = spec.get("interior", {})
@@ -138,53 +138,33 @@ def build_3d_prompt(spec: Dict[str, Any]) -> str:
     bedrooms = spec.get("bedrooms", 3)
     bathrooms = spec.get("bathrooms", 2)
     plot_size = spec.get("plot_size_sqft", 2500)
-    flooring = interior.get("flooring", dna.get("flooring", "warm hardwood flooring"))
+    flooring = interior.get("flooring", dna.get("flooring", "warm light oak wood plank flooring"))
     furniture = interior.get("furniture", dna.get("furniture", "designer furniture"))
-    environment = spec.get("environment", "landscaped grounds")
-    ext = spec.get("exterior", {})
 
     spatial = spec.get("spatial_layout", {})
     staircase_clause = (
-        f"{spatial.get('staircase', 'a central open floating staircase connecting the floors')} visible between the floors, "
+        f"{spatial.get('staircase', 'a central wooden staircase')} connecting levels, "
         if floors > 1 else ""
     )
 
-    # Secondary bedrooms description
     sec_beds = bedrooms - 1
-    sec_bed_str = f"{sec_beds} secondary bedroom{'s' if sec_beds > 1 else ''} each with {'beds and wardrobes' if sec_beds > 1 else 'a bed and wardrobe'}"
-
-    # Extra rooms
-    extra_rooms = []
-    rooms_list = spec.get("rooms", [])
-    for room in rooms_list:
-        if "Pooja" in room: extra_rooms.append("a small pooja/prayer room")
-        if "Office" in room or "Study" in room: extra_rooms.append("a home office with desk and shelving")
-        if "Courtyard" in room: extra_rooms.append("a central open-air courtyard with a water feature")
-    extra_str = ", ".join(extra_rooms) + ", " if extra_rooms else ""
-
-    # Landscape around the dollhouse
-    landscape_str = f"The house sits on {environment} visible around the exterior walls."
+    sec_bed_str = f"{sec_beds} secondary furnished bedrooms with double beds and nightstands"
 
     prompt = (
-        f"Ultra-HD 8K photorealistic 3D isometric dollhouse floor plan architectural visualization of a complete {floors_label} {style} {house_type}, {plot_size} sqft. "
-        f"Perspective: 45-degree elevated isometric angled bird's-eye view — NOT straight top-down, NOT eye-level — the classic architectural dollhouse cutaway angle looking diagonally into the interior. "
-        f"Structure: roof completely removed so all interior rooms are fully visible, thick 3D standing walls with visible depth and thickness at edges, doorway openings and window cutouts clearly cut through the walls. "
-        f"{staircase_clause}"
-        f"Room Layout with labels: "
-        f"ENTRY PORCH — covered entrance at the front center; "
-        f"LIVING ROOM — main living space with {furniture}, wooden coffee table, and area rug; "
-        f"DINING AREA — open dining with a dining table and chairs; "
-        f"KITCHEN — open kitchen with island counter, cabinetry, and appliances; "
-        f"MASTER BEDROOM — with a king-size bed, two nightstands, walk-in wardrobe, and en-suite bathroom; "
+        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway render of a complete {floors_label} {style} {house_type}, {plot_size} sqft layout. "
+        f"Perspective: top-down 90-degree bird's-eye architectural cutaway view looking straight down inside all furnished rooms with the roof completely removed. "
+        f"Perimeter & Walls: dark charcoal thick exterior boundary walls enclosing the square house layout, clean white interior room partition walls with doorway openings. "
+        f"Room Layout: "
+        f"central spacious living room with plush sofa set, coffee table, and television wall; "
+        f"open dining area with wooden table; "
+        f"modern kitchen with island counter and cabinets; "
+        f"master bedroom suite with king bed and nightstands; "
         f"{sec_bed_str}; "
-        f"{bathrooms} modern bathroom{'s' if bathrooms > 1 else ''} with glass shower, vanity sink, and toilet; "
-        f"{extra_str}"
-        f"Rear terrace/deck with outdoor seating if applicable. "
-        f"Interior Finishes: {flooring} across all living and bedroom areas, tiled surfaces in kitchen and bathrooms, bright white interior walls. "
-        f"Lighting: warm golden sunlight streaming diagonally through windows casting soft realistic shadows across the interior floors and furniture. "
-        f"Surroundings: {landscape_str} Green grass and trees visible around the exterior of the building. "
-        f"Quality: ultra-detailed photorealistic 3D architectural dollhouse visualization, accurate furniture scale, crisp material textures, 8K resolution. "
-        f"Negative: straight top-down 2D blueprint view, eye-level interior photo, exterior facade photo only, roof covering the interior, ceiling blocking rooms, flat black-and-white CAD drawing, wireframe, low quality, blurry, pixelated, watermark, text"
+        f"{bathrooms} modern tiled bathrooms with vanity sink, glass shower, and toilet; {staircase_clause}"
+        f"Flooring & Lighting: {flooring} running throughout all living and bedroom spaces, warm cozy interior ambient lighting casting soft golden glows and directional shadows across the wood floors. "
+        f"Surroundings: lush green trees and foliage framing the dark exterior perimeter walls. "
+        f"Quality: professional 3D architectural rendering, crisp realistic textures, soft ambient occlusion shadows, 8K resolution. "
+        f"Negative: eye-level view, facade photo, roof covering rooms, ceiling blocking view, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
     )
     return prompt
 
