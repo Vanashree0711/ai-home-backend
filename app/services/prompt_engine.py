@@ -11,8 +11,8 @@ Guarantees 100% architectural match across all 3 views derived from the user's r
    light natural blonde oak wide-plank wood flooring, cream white modular sofa, white coffee table,
    framed minimalist wall art, and floor-to-ceiling glass window showing lavender bushes outside.
 
-3. 3D FLOOR PLAN: Top-down 90-degree bird's-eye 3D cutaway of the SAME house layout,
-   thick dark black perimeter walls, SAME light blonde oak wood plank flooring in all rooms,
+3. 3D FLOOR PLAN: Exact straight overhead 90-degree top-down 3D architectural view of the ENTIRE home interior,
+   showing all rooms from wall to wall, thick dark black perimeter walls, SAME light blonde oak wood plank flooring,
    cream sofa in living room, purple/lavender bedspreads in bedrooms, and tiled bathrooms.
 """
 
@@ -60,23 +60,23 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D ARCHITECTURAL FLOOR PLAN CUTAWAY — Matched 1:1 to Reference Image 3.
+    C. 3D ARCHITECTURAL FLOOR PLAN CUTAWAY — Exact straight top-down view of ENTIRE home interior layout.
     """
     plot_size = spec.get("plot_size_sqft", 2500)
 
     prompt = (
-        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway of the SAME modern two-storey home layout, {plot_size} sqft. "
-        f"Perspective: top-down 90-degree bird's-eye view looking straight down inside all furnished rooms with the roof completely removed. "
-        f"Perimeter Walls: thick dark black exterior perimeter walls enclosing the square house footprint, clean white interior partition walls with doorway openings. "
-        f"Exact Room Distribution & Layout: "
-        f"BOTTOM CENTER — entry porch opening into the central living room with a cream white modular sofa, white coffee table, and soft lilac lavender wall accent; "
-        f"TOP CENTER — open kitchen with marble island counter and dining area with wooden table; "
+        f"Ultra-HD 8K photorealistic 3D architectural floor plan cutaway of the ENTIRE modern home layout, {plot_size} sqft. "
+        f"Perspective: exact straight overhead 90-degree top-down bird's-eye architectural 3D view looking directly down inside the ENTIRE home interior showing all rooms simultaneously from wall to wall, roof completely removed. "
+        f"Perimeter Walls: thick dark black exterior perimeter walls enclosing the entire square house layout, clean white interior partition walls with doorway openings. "
+        f"Complete Room Distribution & Furnishing across the entire home: "
+        f"BOTTOM CENTER — front entry porch leading into central living room with cream white modular sofa, white coffee table, and soft lilac lavender wall accent; "
+        f"TOP CENTER — open kitchen with marble island counter and dining area with wooden table and chairs; "
         f"LEFT WING — two bedrooms with purple lavender bedspreads and a shared tiled bathroom; "
         f"RIGHT WING — primary bedroom suite with double bed, en-suite bathroom with glass shower, and laundry room. "
-        f"Flooring & Finishes: light natural blonde oak wood plank flooring running continuously throughout all living and bedroom areas, identical to the interior view. "
+        f"Flooring & Finishes: light natural blonde oak wood plank flooring running continuously throughout all living and bedroom areas of the entire home layout, identical to the interior view. "
         f"Lighting & Surroundings: warm indoor ambient lights casting directional soft shadows on the oak floors, green trees and foliage framing the dark exterior boundary walls. "
-        f"Quality: professional 3D architectural rendering, crisp textures, soft ambient occlusion, 8K resolution. "
-        f"Negative: eye-level view, exterior facade photo, roof covering rooms, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
+        f"Quality: professional 3D architectural rendering of the complete house layout, crisp textures, soft ambient occlusion, 8K resolution. "
+        f"Negative: eye-level view, angled view, exterior facade photo, roof covering rooms, flat 2D blueprint lines, wireframe, low quality, blurry, watermark, text"
     )
     return prompt
 
