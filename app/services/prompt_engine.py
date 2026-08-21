@@ -4,7 +4,7 @@ Specialized Architectural Image Prompt Engine (Master Blueprint Driven)
 Derives Exterior, Interior, and 3D Floor Plan representations directly from
 the immutable Master House Design Specification.
 
-Guarantees 100% architectural and spatial consistency across all three views.
+Calibrated to the 45-degree isometric 3D architectural cutaway diorama standard.
 """
 
 from typing import Dict, Any, List
@@ -64,7 +64,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
 
     windows = ext.get("windows", "large black-framed floor-to-ceiling glass windows")
     doors = ext.get("doors", "grand solid wooden entrance door")
-    flooring = interior.get("flooring") or ("light blonde oak herringbone hardwood flooring" if is_scandi else "large-format polished Italian marble and hardwood")
+    flooring = interior.get("flooring") or ("warm natural light oak wood plank flooring" if is_scandi else "large-format polished Italian marble and hardwood")
     lighting = interior.get("lighting") or ("soft diffused Nordic daylight, sculptural woven pendant lamp, and warm ambient floor lamps" if is_scandi else "warm indirect 3000K architectural LED lighting")
     furniture = interior.get("furniture") or (f"contemporary {style} designer furniture")
     roof = ext.get("roof", "flat contemporary roof")
@@ -75,7 +75,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     # Landscape & Features
     features_list = []
     if ext.get("pool"): features_list.append("rectangular swimming pool with wooden sun deck")
-    if ext.get("garden"): features_list.append("landscaped garden with green lawn and pathway")
+    if ext.get("garden"): features_list.append("landscaped garden with green lawn, stone pathway, and flower bushes")
     if ext.get("balcony"): features_list.append("upper-level glass railing balcony")
     if ext.get("parking"): features_list.append("two-car covered parking carport")
     if ext.get("courtyard"): features_list.append("central open-air courtyard")
@@ -128,7 +128,7 @@ def build_exterior_prompt(spec: Dict[str, Any]) -> str:
 
     prompt = (
         f"Wide-angle architectural photograph of the exterior of a {id_dna['floors_label']} {id_dna['style']} {id_dna['house_type']}, {id_dna['plot_size']} sqft. "
-        f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green lawn and pathway in foreground, open sky above, never cropped, no close-ups. "
+        f"Perspective: full property wide three-quarter front view from a distance with generous space on all sides, complete building fully visible from ground to roof, centered in frame, green lawn and stone pathway in foreground, open sky above, never cropped, no close-ups. "
         f"Facade Architecture: clean geometric volume finished in {id_dna['primary_color']} with {id_dna['wood_tone']} and {id_dna['stone_type']}, {id_dna['windows']}, clearly visible entrance at {id_dna['entrance']}, {id_dna['roof']}. "
         f"Site & Grounds: {id_dna['features_str']}, situated on {id_dna['environment']}. "
         f"Visual standard: high resolution, HD, luxury real-estate photography, natural bright daytime sunlight, crisp reflections, realistic shadows, 8k resolution. "
@@ -141,8 +141,7 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
     """
     B. INTERIOR VIEW:
     Derived directly from Master House Specification.
-    Staged inside the ground floor living room & open kitchen of the Master Blueprint,
-    showing identical wall colors, wood accents, flooring, ceiling, staircase, and windows.
+    Staged inside the ground floor living room & open kitchen of the Master Blueprint.
     """
     id_dna = synthesize_design_identity(spec)
 
@@ -162,28 +161,31 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    C. 3D FLOOR PLAN:
-    Derived directly from Master House Specification.
-    Straight 90-degree overhead bird's-eye architectural 3D cutaway showing the complete house blueprint layout.
+    C. 3D FLOOR PLAN / DIORAMA:
+    Elevated 45-degree isometric 3D architectural cutaway diorama view with roof sliced off.
+    Matches the exact benchmark format: clean standing walls with window and door cutouts,
+    warm light wood plank flooring, fully furnished rooms, golden sunlight streaming across the floor,
+    and surrounding lush landscaped garden with stone pathways and water views.
     """
     id_dna = synthesize_design_identity(spec)
 
     staircase_spatial = f"and {id_dna['staircase']}, " if id_dna['floors'] > 1 else ""
 
     rooms_breakdown = (
-        f"master bedroom suite with bed and nightstands, {id_dna['bedrooms'] - 1} secondary bedrooms with beds, "
-        f"{id_dna['bathrooms']} modern bathrooms with glass showers and vanities, "
-        f"front open living room with sectional sofa set and coffee table, {staircase_spatial}"
-        f"gourmet kitchen with island counter and dining table with chairs, hallways, closets, and {id_dna['doors']}"
+        f"cozy living room with sofa set and round coffee table, wooden dining table with chairs, {staircase_spatial}"
+        f"furnished bedroom with made bed, nightstands, and wall artwork, modern bathroom with ceramic toilet and vanity sink, "
+        f"and kitchen counters"
     )
 
     prompt = (
-        f"Stunning photorealistic 3D architectural floor plan visualization of the ENTIRE {id_dna['floors_label']} {id_dna['style']} home blueprint, {id_dna['plot_size']} sqft. "
-        f"Perspective: full-property 90-degree straight overhead bird's-eye view showing the complete entire house layout with roof removed from wall to wall. "
-        f"Master Blueprint Structure: thick solid dark charcoal boundary walls, exterior walls in {id_dna['primary_color']}, {id_dna['flooring']} throughout all rooms, {id_dna['wood_tone']} interior doors and cabinetry. "
-        f"Arrangement: {id_dna['entrance']}, {rooms_breakdown}, indoor potted plants, and surrounding outdoor {id_dna['features_str']} around perimeter walls. "
-        f"Lighting & Rendering: warm directional sunlight rays casting soft realistic shadows across floorboards, ultra-high detail 3D architectural rendering, 8k resolution, photorealistic master house plan. "
-        f"Negative: single room, cropped room, partial floor plan, ceiling on, eye-level perspective, blank white model, grey CAD wireframe, low detail, blurry, distorted walls, text, watermark"
+        f"Stunning photorealistic 3D architectural cutaway rendering of the {id_dna['floors_label']} {id_dna['style']} residence, {id_dna['plot_size']} sqft. "
+        f"Perspective: elevated 45-degree isometric three-quarter top-down dollhouse view with roof removed to look down into the full room layout. "
+        f"Walls & Openings: clean standing {id_dna['primary_color']} walls with wall-top cutoffs, doorway openings, and exterior window cutouts looking out. "
+        f"Flooring & Finishes: {id_dna['flooring']} across living and bedroom areas, light tiled bathroom floor. "
+        f"Furnished layout: {rooms_breakdown}, indoor potted green plants. "
+        f"Lighting & Environment: golden warm sunlight streaming diagonally across the rooms casting soft realistic shadows, surrounded by lush green lawn, stone garden pathway, flower bushes, situated on {id_dna['environment']}. "
+        f"Visual standard: high resolution, 3D architectural diorama visualization, HD quality, realistic materials, warm ambient lighting, 8k resolution. "
+        f"Negative: ceiling on, eye-level perspective, flat 2D blueprint, black and white CAD drawing, wireframe, low quality, blurry, text, watermark"
     )
     return prompt
 
