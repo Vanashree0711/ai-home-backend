@@ -1,11 +1,11 @@
 """
-Master Design Specification Parser
-==================================
-Extracts a complete, deterministic, and structured Master House Design Specification
-from the user's natural language prompt, style selection, budget, and plot size.
+Master House Design Specification & Spatial Blueprint Engine
+============================================================
+Creates a deterministic, architecturally validated Master House Specification
+from the user's natural language requirements.
 
-This specification serves as the SINGLE SOURCE OF TRUTH for all downstream
-architectural visualization, cost analysis, and blueprint compilation.
+This serves as the single immutable blueprint from which Exterior, Interior,
+and 3D Floor Plan representations are derived with hard architectural consistency.
 """
 
 import re
@@ -19,15 +19,15 @@ def parse_master_design_specification(
     plot_size: int = 2500
 ) -> Dict[str, Any]:
     """
-    Analyzes natural language prompt and synthesizes a structured Master Design Specification.
-    Strictly preserves user requirements without inventing conflicting elements.
+    Analyzes natural language prompt and synthesizes a structured Master Design Specification
+    with complete spatial layout, room positions, door/window placements, and staircase locations.
     """
     p = prompt.lower()
 
     # --------------------------------------------------------------------------
     # 1. FLOORS (Strict adherence to user requirement)
     # --------------------------------------------------------------------------
-    floors = 2  # Standard architectural default if unspecified
+    floors = 2  # Standard default if unspecified
     if any(kw in p for kw in [
         "single floor", "one floor", "1 floor", "single storey", "one storey",
         "1 storey", "single story", "one story", "ground floor only", "bungalow",
@@ -94,7 +94,6 @@ def parse_master_design_specification(
                 bedrooms = val
                 break
 
-    # Default bathrooms based on scale if unspecified
     if "compact" in p or "small" in p or "budget" in p or bedrooms <= 2:
         bathrooms = 1
     else:
@@ -111,9 +110,8 @@ def parse_master_design_specification(
                 break
 
     # --------------------------------------------------------------------------
-    # 4. EXTERIOR ATTRIBUTES & ENVIRONMENT SETTING
+    # 4. ENVIRONMENT & SITE SETTING
     # --------------------------------------------------------------------------
-    # Environmental Geography (Island, Lake, Ocean, Mountain, Forest)
     environment = "landscaped residential grounds"
     if any(kw in p for kw in ["island", "private island", "on an island", "tropical island", "around island"]):
         environment = "private tropical island surrounded by turquoise ocean water and sandy shores"
@@ -126,9 +124,12 @@ def parse_master_design_specification(
     elif any(kw in p for kw in ["forest", "pine", "woodland"]):
         environment = "serene forest clearing surrounded by tall evergreen trees"
 
+    # --------------------------------------------------------------------------
+    # 5. COLORS & MATERIALS
+    # --------------------------------------------------------------------------
     exterior_colors: List[str] = []
     color_map = {
-        "white": "warm white", "off-white": "off-white", "cream": "cream",
+        "cream": "warm cream", "white": "warm white", "off-white": "off-white",
         "beige": "warm beige", "grey": "slate grey", "gray": "slate grey",
         "charcoal": "dark charcoal", "black": "matte black", "terracotta": "terracotta red",
         "brick red": "warm brick red", "red": "warm brick red", "brown": "natural earth brown",
@@ -157,8 +158,9 @@ def parse_master_design_specification(
     if not exterior_materials:
         exterior_materials = ["smooth concrete render", "natural timber accents", "clear glass"]
 
+    # Windows
     if "floor-to-ceiling" in p or "floor to ceiling" in p or "large glass window" in p:
-        windows = "large floor-to-ceiling glass windows"
+        windows = "large black-framed floor-to-ceiling glass windows"
     elif "black frame" in p or "black-frame" in p:
         windows = "large black-framed panoramic windows"
     elif "traditional" in p or "wooden window" in p:
@@ -168,6 +170,7 @@ def parse_master_design_specification(
     else:
         windows = "expansive contemporary glass windows"
 
+    # Roof
     if any(kw in p for kw in ["terracotta roof", "clay roof", "sloped tile", "tiled roof", "mangalore tile", "tiled sloping roof", "sloping roof", "sloping tile"]):
         roof = "sloping terracotta tile roof"
     elif any(kw in p for kw in ["pitched roof", "sloped roof", "gable roof", "gable"]):
@@ -177,7 +180,7 @@ def parse_master_design_specification(
     else:
         roof = "sloping terracotta tile roof" if style == "Traditional Indian" else ("flat contemporary roof" if style in ["Modern Luxury", "Minimalist Scandinavian", "Modern Industrial"] else "sloped pitched roof")
 
-    doors = "grand pivot wooden entrance door"
+    doors = "grand solid wooden entrance door"
     if "carved" in p or "traditional" in p:
         doors = "hand-carved traditional teak wood door"
     elif "glass door" in p:
@@ -191,14 +194,14 @@ def parse_master_design_specification(
     has_porch = ("porch" in p or "verandah" in p or "patio" in p or "deck" in p)
 
     # --------------------------------------------------------------------------
-    # 5. INTERIOR ATTRIBUTES (Flooring, Lighting, Materials, Colors, Furniture)
+    # 6. INTERIOR ATTRIBUTES & FINISHES
     # --------------------------------------------------------------------------
     if "red oxide" in p:
         flooring = "traditional polished red oxide flooring"
     elif "marble" in p:
         flooring = "large-format polished Italian marble"
-    elif "grey flooring" in p or "gray flooring" in p:
-        flooring = "modern grey porcelain and stone flooring"
+    elif "grey flooring" in p or "gray flooring" in p or "grey stone" in p:
+        flooring = "modern grey stone and porcelain tile flooring"
     elif "hardwood" in p or "wood floor" in p or "oak floor" in p:
         flooring = "wide-plank natural hardwood flooring"
     elif "concrete" in p:
@@ -236,22 +239,36 @@ def parse_master_design_specification(
     else:
         furniture = "contemporary minimalist designer furniture"
 
+    # Ceiling & Lighting Design
+    ceiling_design = "smooth architectural ceiling with concealed warm 3000K LED cove lighting"
+    if "beam" in p or "exposed" in p:
+        ceiling_design = "exposed solid wood ceiling beams with recessed spot lighting"
+
     # --------------------------------------------------------------------------
-    # 6. ROOMS & SPECIAL REQUIREMENTS
+    # 7. SPATIAL BLUEPRINT (Room Connections, Staircase, Entrance & Windows)
     # --------------------------------------------------------------------------
-    rooms = [f"{bedrooms} Bedrooms", f"{bathrooms} Bathrooms", "Living Room", "Kitchen & Dining"]
-    if has_courtyard:
-        rooms.append("Central Open Courtyard (Aangan)")
-    if "pooja" in p or "prayer" in p:
-        rooms.append("Dedicated Pooja Room")
-    if "office" in p or "study" in p:
-        rooms.append("Home Office / Study")
-    if "theatre" in p or "theater" in p:
-        rooms.append("Home Theatre")
-    if "gym" in p:
-        rooms.append("Home Gym")
-    if has_porch:
-        rooms.append("Covered Verandah / Porch")
+    staircase_position = "central architectural open staircase along the interior side wall connecting levels" if floors > 1 else "single level (no staircase required)"
+    entrance_position = "front-center entrance foyer with grand solid wood door"
+    living_position = "front-facing open living room with large floor-to-ceiling glass sliding doors looking out to the garden"
+    kitchen_position = "open-concept modular kitchen with central island and adjacent dining zone on the ground floor rear"
+
+    rooms_list = [f"{bedrooms} Bedrooms", f"{bathrooms} Bathrooms", "Living Room", "Modular Kitchen & Dining"]
+    if has_courtyard: rooms_list.append("Central Open Courtyard (Aangan)")
+    if "pooja" in p or "prayer" in p: rooms_list.append("Dedicated Pooja Room")
+    if "office" in p or "study" in p: rooms_list.append("Home Office / Study")
+    if has_porch: rooms_list.append("Covered Verandah / Porch")
+
+    spatial_layout = {
+        "entrance": entrance_position,
+        "staircase": staircase_position,
+        "living_room": living_position,
+        "kitchen": kitchen_position,
+        "floors_count": floors,
+        "ceiling_design": ceiling_design,
+        "dimensions": f"{plot_size} sqft total area with 10-foot ceiling clearances",
+        "window_system": windows,
+        "door_system": doors
+    }
 
     special_requirements: List[str] = []
     if has_pool: special_requirements.append("Swimming Pool")
@@ -265,7 +282,7 @@ def parse_master_design_specification(
     if "lake" in p: special_requirements.append("Lakefront Location")
 
     # --------------------------------------------------------------------------
-    # 7. ASSEMBLE MASTER DESIGN SPECIFICATION SCHEMA
+    # 8. ASSEMBLE IMMUTABLE MASTER HOUSE SPECIFICATION
     # --------------------------------------------------------------------------
     master_spec = {
         "house_type": house_type,
@@ -276,6 +293,7 @@ def parse_master_design_specification(
         "plot_size_sqft": plot_size,
         "budget_usd": budget,
         "environment": environment,
+        "spatial_layout": spatial_layout,
         "exterior": {
             "primary_color": primary_color,
             "secondary_color": secondary_color,
@@ -300,6 +318,7 @@ def parse_master_design_specification(
             "materials": interior_materials,
             "flooring": flooring,
             "lighting": lighting,
+            "ceiling": ceiling_design,
             "furniture": furniture
         },
         "house": {
@@ -310,7 +329,7 @@ def parse_master_design_specification(
             "budget_usd": budget,
             "environment": environment
         },
-        "rooms": rooms,
+        "rooms": rooms_list,
         "special_requirements": special_requirements,
         "original_prompt": prompt
     }
