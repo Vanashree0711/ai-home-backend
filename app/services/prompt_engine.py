@@ -4,8 +4,7 @@ Specialized Architectural Image Prompt Engine (Stage 3 Calibrated)
 Transforms a Master Design Specification into synchronized, specialized prompts
 for Exterior, Interior, and Photorealistic 3D Layout Visualizations.
 
-Calibrated specifically for Minimalist Scandinavian, Modern Luxury, Traditional,
-and other architectural styles with strict photographic and visual standards.
+Guarantees that all 3 views represent the EXACT SAME HOUSE with full-property scope.
 """
 
 from typing import Dict, Any, List
@@ -35,7 +34,6 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     materials = ext.get("materials", ["smooth off-white plaster render", "blonde oak timber", "clear glass"])
     materials_str = ", ".join(materials)
 
-    # Wood & Stone specific identification
     is_scandi = "scandinavian" in style.lower() or "nordic" in style.lower() or "minimalist" in style.lower()
 
     if is_scandi:
@@ -65,7 +63,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
 
         windows = ext.get("windows", "large black-framed floor-to-ceiling glass windows")
         doors = ext.get("doors", "grand pivot wooden entrance door")
-        flooring = interior.get("flooring", "large-format polished Italian marble")
+        flooring = interior.get("flooring", "large-format polished Italian marble and hardwood")
         lighting = interior.get("lighting", "warm indirect 3000K architectural LED lighting")
         furniture = interior.get("furniture", f"contemporary {style} designer furniture")
 
@@ -76,7 +74,7 @@ def synthesize_design_identity(spec: Dict[str, Any]) -> Dict[str, Any]:
     if ext.get("pool"): features_list.append("rectangular swimming pool with wooden sun deck")
     if ext.get("garden"): features_list.append("landscaped garden with white birch trees and ornamental grasses" if is_scandi else "landscaped garden with green lawn")
     if ext.get("balcony"): features_list.append("upper-level glass railing balcony")
-    if ext.get("parking"): features_list.append("gravel driveway and covered carport")
+    if ext.get("parking"): features_list.append("two-car covered parking carport")
     if ext.get("courtyard"): features_list.append("central open-air courtyard")
     if ext.get("porch"): features_list.append("covered entrance veranda")
     features_str = ", ".join(features_list) if features_list else "landscaped outdoor grounds"
@@ -155,28 +153,26 @@ def build_interior_prompt(spec: Dict[str, Any]) -> str:
 
 def build_3d_prompt(spec: Dict[str, Any]) -> str:
     """
-    3. PHOTOREALISTIC 3D LAYOUT:
-    Straight 90-degree overhead bird's-eye architectural 3D floor plan visualization with roof removed.
-    Matches the exact benchmark format: dark thick boundary walls, light natural wood plank flooring,
-    furnished bedrooms, tiled bathrooms with glass showers, living room, dining, warm directional sunlight rays,
-    and surrounding green trees around the perimeter.
+    3. PHOTOREALISTIC 3D LAYOUT OF THE ENTIRE HOME:
+    Straight 90-degree overhead bird's-eye architectural 3D cutaway showing the COMPLETE HOUSE FLOOR PLAN.
+    Displays all bedrooms, bathrooms, living spaces, kitchen, dining, and perimeter garden in one master layout.
     """
     id_dna = synthesize_design_identity(spec)
 
     rooms_breakdown = (
-        f"furnished {id_dna['bedrooms']} bedrooms with {id_dna['wood_tone']} beds and side tables, "
-        f"{id_dna['bathrooms']} modern bathrooms with glass walk-in showers and ceramic vanities, "
-        f"spacious Scandinavian living room area with comfortable sofa set, open dining space, and wooden interior doors"
+        f"master bedroom suite with king bed and side tables, {id_dna['bedrooms'] - 1} secondary bedrooms with beds, "
+        f"{id_dna['bathrooms']} modern bathrooms with glass showers and vanities, "
+        f"large open living room with sectional sofa set and coffee table, gourmet kitchen with island counter and dining table with chairs, "
+        f"hallways, closets, and wooden interior doors"
     )
 
     prompt = (
-        f"Stunning photorealistic 3D architectural floor plan layout of the SAME {id_dna['floors_label']} {id_dna['style']} house, {id_dna['plot_size']} sqft. "
-        f"Perspective: 90-degree straight overhead bird's-eye top-down view with entire roof sliced away to reveal the full interior room layout. "
-        f"Walls & Flooring: thick solid dark charcoal boundary walls, {id_dna['flooring']} throughout all rooms. "
-        f"Furnished layout: {rooms_breakdown}, indoor potted green plants. "
-        f"Lighting & Environment: warm directional sunlight casting soft realistic shadows across the wooden floorboards, lush green trees and foliage surrounding the exterior perimeter walls. "
-        f"Visual standard: ultra-detailed 3D architectural rendering, high resolution, HD quality, realistic materials, photorealistic interior layout presentation. "
-        f"Negative: ceiling on, eye-level perspective, blank white model, grey CAD wireframe, low detail, blurry, distorted walls, text, watermark"
+        f"Stunning photorealistic 3D architectural floor plan visualization of the ENTIRE {id_dna['floors_label']} {id_dna['style']} home, {id_dna['plot_size']} sqft. "
+        f"Perspective: full-property 90-degree straight overhead bird's-eye view showing the complete entire house layout with roof removed from wall to wall. "
+        f"Complete floor plan structure: thick solid dark charcoal boundary walls, {id_dna['flooring']} throughout all rooms, {id_dna['wood_tone']} interior doors and cabinetry. "
+        f"Full furnished rooms: {rooms_breakdown}, indoor potted plants, and surrounding outdoor {id_dna['features_str']} around the perimeter walls. "
+        f"Lighting & Rendering: warm directional sunlight rays casting soft realistic shadows across wooden floorboards, ultra-high detail 3D architectural rendering, 8k resolution, photorealistic master house plan. "
+        f"Negative: single room, cropped room, partial floor plan, ceiling on, eye-level perspective, blank white model, grey CAD wireframe, low detail, blurry, distorted walls, text, watermark"
     )
     return prompt
 
